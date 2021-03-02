@@ -14,13 +14,13 @@ namespace Service.BalanceHistory.Client
     {
         private readonly CallInvoker _channel;
 
-        public BalanceHistoryClientFactory(string assetsDictionaryGrpcServiceUrl)
+        public BalanceHistoryClientFactory(string balanceHistoryGrpcServiceUrl)
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            var channel = GrpcChannel.ForAddress(assetsDictionaryGrpcServiceUrl);
+            var channel = GrpcChannel.ForAddress(balanceHistoryGrpcServiceUrl);
             _channel = channel.Intercept(new PrometheusMetricsInterceptor());
         }
 
-        public IHelloService GetHelloService() => _channel.CreateGrpcService<IHelloService>();
+        public IWalletBalanceUpdateService GetWalletBalanceUpdateService() => _channel.CreateGrpcService<IWalletBalanceUpdateService>();
     }
 }

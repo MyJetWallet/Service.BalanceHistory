@@ -16,11 +16,14 @@ namespace TestApp
             Console.ReadLine();
 
 
-            var factory = new BalanceHistoryClientFactory("http://localhost:5001");
-            var client = factory.GetHelloService();
+            var factory = new BalanceHistoryClientFactory("http://localhost:80");
+            var client = factory.GetWalletBalanceUpdateService();
 
-            var resp = await  client.SayHelloAsync(new HelloRequest(){Name = "Alex"});
-            Console.WriteLine(resp?.Message);
+            var resp = await client.GetBalanceUpdatesAsync(new GetBalanceUpdateRequest() { WalletId = "test--default", Take = 20 });
+            foreach (var update in resp.BalanceUpdates)
+            {
+                Console.WriteLine($"{update.EventType}: {update.Symbol} {update.AmountBalance} {update.AmountReserve} | {update.Id} | {update.SequenceId}");
+            }
 
             Console.WriteLine("End");
             Console.ReadLine();

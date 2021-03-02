@@ -1,23 +1,21 @@
 ﻿using System.Reflection;
+using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Autofac;
 using MyJetWallet.Sdk.GrpcMetrics;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
 using Prometheus;
 using ProtoBuf.Grpc.Server;
-using Service.BalanceHistory.Grpc;
-using Service.BalanceHistory.Modules;
 using Service.BalanceHistory.Postgres;
-using Service.BalanceHistory.Services;
+using Service.BalanceHistory.Writer.Modules;
 using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
 
-namespace Service.BalanceHistory
+namespace Service.BalanceHistory.Writer
 {
     public class Startup
     {
@@ -31,7 +29,7 @@ namespace Service.BalanceHistory
 
             services.AddHostedService<ApplicationLifetimeManager>();
 
-            services.AddDatabaseWithoutMigrations<DatabaseContext>(DatabaseContext.Schema, Program.Settings.PostgresConnectionString);
+            services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString, o => new DatabaseContext(o));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -51,8 +49,6 @@ namespace Service.BalanceHistory
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<WalletBalanceUpdateService, IWalletBalanceUpdateService>();
-
                 endpoints.MapGrpcSchemaRegistry();
 
                 endpoints.MapGet("/", async context =>

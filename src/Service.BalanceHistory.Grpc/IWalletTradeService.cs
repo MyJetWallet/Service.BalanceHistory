@@ -5,9 +5,9 @@ using Service.BalanceHistory.Grpc.Models;
 namespace Service.BalanceHistory.Grpc
 {
     [ServiceContract]
-    public interface IHelloService
+    public interface IWalletBalanceUpdateService
     {
         [OperationContract]
-        Task<HelloMessage> SayHelloAsync(HelloRequest request);
+        Task<WalletBalanceUpdateList> GetBalanceUpdatesAsync(GetBalanceUpdateRequest request);
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>a3f97508-1bfc-4f5f-93ef-58128651283c</UserSecretsId>
+    <UserSecretsId>E1AD248D-2100-407F-BC3E-894B055169A5</UserSecretsId>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
@@ -21,6 +21,7 @@
     <PackageReference Include="MyJetWallet.Sdk.GrpcSchema" Version="1.0.5" />
     <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="1.1.0" />
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.0.8" />
+    <PackageReference Include="MyJetWallet.Service.MatchingEngine.EventBridge.ServiceBus" Version="1.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="4.1.1" />
