@@ -37,13 +37,19 @@ jobs:
     - name: ls
       run: ls
 
-    - name: Publish Service
+    - name: Publish Service API 
       run: dotnet publish --no-build ./src/Service.BalanceHistory/Service.BalanceHistory.csproj --configuration Release --output ./publish-api
+
+    - name: Publish Service Worker 
+      run: dotnet publish --no-build ./src/Service.BalanceHistory.Worker/Service.BalanceHistory.Worker.csproj --configuration Release --output ./publish-worker
 
     - name: Check Service dir
       run: ls ./publish-api
+
+    - name: Check Service dir
+      run: ls ./publish-worker
       
-    - name: Publish image
+    - name: Publish image API
       uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
@@ -54,3 +60,13 @@ jobs:
         tags: latest
         build_args: app_version=myjetwallet.service.balancehistory-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
+    - name: Publish image Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        path: ./publish-worker
+        registry: docker.pkg.github.com
+        repository: ${{ secrets.ORG_NAME }}/service.balancehistory/myjetwallet.service.balancehistory.worker-test
+        tags: latest
+        build_args: app_version=myjetwallet.service.balancehistory.worker-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}

@@ -30,18 +30,24 @@ jobs:
     - name: ls
       run: ls
 
-    - name: Publish Service
+    - name: Publish Service API
       run: dotnet publish ./src/Service.BalanceHistory/Service.BalanceHistory.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
+
+    - name: Publish Service Worker
+      run: dotnet publish ./src/Service.BalanceHistory.Worker/Service.BalanceHistory.Worker.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-worker
 
     - name: Check Service dir
       run: ls ./publish-api
+
+    - name: Check Service dir
+      run: ls ./publish-worker
 
     - name: Extract branch name
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
       id: extract_branch
 
-    - name: Publish image
+    - name: Publish image API
       uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
@@ -51,4 +57,15 @@ jobs:
         repository: ${{ secrets.ORG_NAME }}/service.balancehistory/myjetwallet.service.balancehistory
         tag_with_ref: true
         build_args: app_version=myjetwallet.service.balancehistory:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image Worker
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        path: ./publish-worker
+        registry: docker.pkg.github.com
+        repository: ${{ secrets.ORG_NAME }}/service.balancehistory/myjetwallet.service.balancehistory.worker
+        tag_with_ref: true
+        build_args: app_version=myjetwallet.service.balancehistory.worker:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
