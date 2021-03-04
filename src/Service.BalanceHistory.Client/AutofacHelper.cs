@@ -6,9 +6,16 @@ namespace Service.BalanceHistory.Client
 {
     public static class AutofacHelper
     {
-        public static void RegisterBalanceHistoryClient(this ContainerBuilder builder, string tradeHistoryGrpcServiceUrl)
+        public static void RegisterBalanceHistoryClient(this ContainerBuilder builder, string balanceHistoryGrpcServiceUrl)
         {
-            var factory = new BalanceHistoryClientFactory(tradeHistoryGrpcServiceUrl);
+            var factory = new BalanceHistoryClientFactory(balanceHistoryGrpcServiceUrl);
+
+            builder.RegisterInstance(factory.GetWalletBalanceUpdateService()).As<IWalletBalanceUpdateService>().SingleInstance();
+        }
+
+        public static void RegisterBalanceHistoryOperationInfoClient(this ContainerBuilder builder, string balanceHistoryOperationInfoGrpcServiceUrl)
+        {
+            var factory = new BalanceHistoryClientFactory(balanceHistoryOperationInfoGrpcServiceUrl);
 
             builder.RegisterInstance(factory.GetWalletBalanceUpdateService()).As<IWalletBalanceUpdateService>().SingleInstance();
         }
