@@ -114,8 +114,9 @@ namespace Service.BalanceHistory.Postgres.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<int>("ChangeType")
-                        .HasColumnType("integer");
+                    b.Property<string>("ChangeType")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Comment")
                         .HasColumnType("text");

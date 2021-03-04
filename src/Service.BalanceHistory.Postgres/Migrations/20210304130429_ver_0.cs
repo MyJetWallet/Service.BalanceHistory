@@ -47,7 +47,7 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 {
                     OperationId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: true),
-                    ChangeType = table.Column<int>(type: "integer", nullable: false),
+                    ChangeType = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     ApplicationName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ApplicationEnvInfo = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
