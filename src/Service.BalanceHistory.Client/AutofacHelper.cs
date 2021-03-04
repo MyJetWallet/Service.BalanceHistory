@@ -17,7 +17,7 @@ namespace Service.BalanceHistory.Client
         {
             var factory = new BalanceHistoryClientFactory(balanceHistoryOperationInfoGrpcServiceUrl);
 
-            builder.RegisterInstance(factory.GetWalletBalanceUpdateService()).As<IWalletBalanceUpdateService>().SingleInstance();
+            builder.RegisterInstance(factory.GetWalletBalanceUpdateOperationInfoService()).As<IWalletBalanceUpdateOperationInfoService>().SingleInstance();
         }
     }
 }
