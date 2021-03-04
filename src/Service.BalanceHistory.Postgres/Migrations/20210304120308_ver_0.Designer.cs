@@ -10,7 +10,7 @@ using Service.BalanceHistory.Postgres;
 namespace Service.BalanceHistory.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210304114409_ver_0")]
+    [Migration("20210304120308_ver_0")]
     partial class ver_0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,11 +104,9 @@ namespace Service.BalanceHistory.Postgres.Migrations
 
             modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", b =>
                 {
-                    b.Property<long>("OperationId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("OperationId")
                         .HasMaxLength(128)
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("ApplicationEnvInfo")
                         .HasMaxLength(256)
