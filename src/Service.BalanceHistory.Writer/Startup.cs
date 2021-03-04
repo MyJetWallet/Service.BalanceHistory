@@ -10,8 +10,10 @@ using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
 using Prometheus;
 using ProtoBuf.Grpc.Server;
+using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Postgres;
 using Service.BalanceHistory.Writer.Modules;
+using Service.BalanceHistory.Writer.Services;
 using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
 
@@ -49,6 +51,8 @@ namespace Service.BalanceHistory.Writer
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGrpcSchema<WalletBalanceUpdateOperationInfoService, IWalletBalanceUpdateOperationInfoService>();
+
                 endpoints.MapGrpcSchemaRegistry();
 
                 endpoints.MapGet("/", async context =>

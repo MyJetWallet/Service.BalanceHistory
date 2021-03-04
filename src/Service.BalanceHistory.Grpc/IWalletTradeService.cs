@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Service.BalanceHistory.Grpc.Models;

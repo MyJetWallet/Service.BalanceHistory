@@ -17,6 +17,7 @@ namespace TestApp
 
 
             var factory = new BalanceHistoryClientFactory("http://localhost:80");
+            //var factory = new BalanceHistoryClientFactory("http://balance-history.services.svc.cluster.local:80");
             var client = factory.GetWalletBalanceUpdateService();
 
             var resp = await client.GetBalanceUpdatesAsync(new GetBalanceUpdateRequest() { WalletId = "test--default", Take = 20 });

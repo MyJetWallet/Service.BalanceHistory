@@ -10,14 +10,16 @@ namespace Service.BalanceHistory.Postgres
         public const string Schema = "balancehistory";
 
         public const string TradeHistoryTableName = "balance_history";
+        public const string OperationInfoTableName = "operation_info";
 
         public DbSet<BalanceHistoryEntity> BalanceHistory { get; set; }
+        public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
         }
-
         public static ILoggerFactory LoggerFactory { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -49,6 +51,14 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new { e.WalletId, e.SequenceId });
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new { e.WalletId, e.Symbol, e.SequenceId });
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => e.SequenceId);
+            modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => e.OperationId);
+
+
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().ToTable(OperationInfoTableName);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().HasKey(e => e.Id);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Id).HasMaxLength(128);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationEnvInfo).HasMaxLength(256);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationName).HasMaxLength(256);
 
 
             base.OnModelCreating(modelBuilder);
@@ -60,6 +70,12 @@ namespace Service.BalanceHistory.Postgres
             return result;
         }
 
-        
+        public async Task<int> UpsetAsync(IEnumerable<WalletBalanceUpdateOperationInfoEntity> entities)
+        {
+            var result = await OperationInfo.UpsertRange(entities).On(e => new { e.Id }).NoUpdate().RunAsync();
+            return result;
+        }
+
+
     }
 }
