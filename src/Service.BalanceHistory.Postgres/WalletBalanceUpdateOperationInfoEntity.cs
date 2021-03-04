@@ -1,5 +1,4 @@
 ﻿using Service.BalanceHistory.Domain.Models;
-using Service.ChangeBalanceGateway.Grpc.Models;
 
 namespace Service.BalanceHistory.Postgres
 {
@@ -9,7 +8,7 @@ namespace Service.BalanceHistory.Postgres
         {
         }
 
-        public WalletBalanceUpdateOperationInfoEntity(string operationId, string comment, ChangeBalanceType changeType, string applicationName, string applicationEnvInfo) : base(operationId, comment, changeType, applicationName, applicationEnvInfo)
+        public WalletBalanceUpdateOperationInfoEntity(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo) : base(operationId, comment, changeType, applicationName, applicationEnvInfo)
         {
         }
 
