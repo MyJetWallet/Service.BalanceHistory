@@ -10,7 +10,7 @@ using Service.BalanceHistory.Postgres;
 namespace Service.BalanceHistory.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210302144125_ver_0")]
+    [Migration("20210304114409_ver_0")]
     partial class ver_0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,8 @@ namespace Service.BalanceHistory.Postgres.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OperationId");
+
                     b.HasIndex("SequenceId");
 
                     b.HasIndex("WalletId");
@@ -98,6 +100,33 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     b.HasIndex("WalletId", "Symbol", "SequenceId");
 
                     b.ToTable("balance_history");
+                });
+
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", b =>
+                {
+                    b.Property<long>("OperationId")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(128)
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("ApplicationEnvInfo")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ApplicationName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("ChangeType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.HasKey("OperationId");
+
+                    b.ToTable("operation_info");
                 });
 #pragma warning restore 612, 618
         }

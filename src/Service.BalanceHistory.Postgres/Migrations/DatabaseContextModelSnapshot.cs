@@ -102,7 +102,7 @@ namespace Service.BalanceHistory.Postgres.Migrations
 
             modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("OperationId")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(128)
                         .HasColumnType("bigint")
@@ -122,7 +122,7 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("OperationId");
 
                     b.ToTable("operation_info");
                 });

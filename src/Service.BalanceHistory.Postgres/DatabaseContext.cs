@@ -55,8 +55,8 @@ namespace Service.BalanceHistory.Postgres
 
 
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().ToTable(OperationInfoTableName);
-            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().HasKey(e => e.Id);
-            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Id).HasMaxLength(128);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().HasKey(e => e.OperationId);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.OperationId).HasMaxLength(128);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationEnvInfo).HasMaxLength(256);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationName).HasMaxLength(256);
 
@@ -72,7 +72,7 @@ namespace Service.BalanceHistory.Postgres
 
         public async Task<int> UpsetAsync(IEnumerable<WalletBalanceUpdateOperationInfoEntity> entities)
         {
-            var result = await OperationInfo.UpsertRange(entities).On(e => new { e.Id }).NoUpdate().RunAsync();
+            var result = await OperationInfo.UpsertRange(entities).On(e => new {Id = e.OperationId}).NoUpdate().RunAsync();
             return result;
         }
 

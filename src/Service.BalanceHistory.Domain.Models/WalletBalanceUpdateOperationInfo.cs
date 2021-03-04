@@ -10,16 +10,16 @@ namespace Service.BalanceHistory.Domain.Models
         {
         }
 
-        public WalletBalanceUpdateOperationInfo(long id, string comment, ChangeBalanceType changeType, string applicationName, string applicationEnvInfo)
+        public WalletBalanceUpdateOperationInfo(long operationId, string comment, ChangeBalanceType changeType, string applicationName, string applicationEnvInfo)
         {
-            Id = id;
+            OperationId = operationId;
             Comment = comment;
             ChangeType = changeType;
             ApplicationName = applicationName;
             ApplicationEnvInfo = applicationEnvInfo;
         }
 
-        [DataMember(Order = 1)] public long Id { get; set; }
+        [DataMember(Order = 1)] public long OperationId { get; set; }
         [DataMember(Order = 2)] public string Comment { get; set; }
         [DataMember(Order = 3)] public ChangeBalanceType ChangeType { get; set; }
         [DataMember(Order = 4)] public string ApplicationName { get; set; }

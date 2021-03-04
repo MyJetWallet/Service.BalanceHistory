@@ -40,6 +40,29 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     table.PrimaryKey("PK_balance_history", x => x.Id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "operation_info",
+                schema: "balancehistory",
+                columns: table => new
+                {
+                    OperationId = table.Column<long>(type: "bigint", maxLength: 128, nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Comment = table.Column<string>(type: "text", nullable: true),
+                    ChangeType = table.Column<int>(type: "integer", nullable: false),
+                    ApplicationName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ApplicationEnvInfo = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_operation_info", x => x.OperationId);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_balance_history_OperationId",
+                schema: "balancehistory",
+                table: "balance_history",
+                column: "OperationId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_balance_history_SequenceId",
                 schema: "balancehistory",
@@ -82,6 +105,10 @@ namespace Service.BalanceHistory.Postgres.Migrations
         {
             migrationBuilder.DropTable(
                 name: "balance_history",
+                schema: "balancehistory");
+
+            migrationBuilder.DropTable(
+                name: "operation_info",
                 schema: "balancehistory");
         }
     }

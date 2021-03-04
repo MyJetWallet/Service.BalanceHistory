@@ -9,12 +9,12 @@ namespace Service.BalanceHistory.Postgres
         {
         }
 
-        public WalletBalanceUpdateOperationInfoEntity(long id, string comment, ChangeBalanceType changeType, string applicationName, string applicationEnvInfo) : base(id, comment, changeType, applicationName, applicationEnvInfo)
+        public WalletBalanceUpdateOperationInfoEntity(long operationId, string comment, ChangeBalanceType changeType, string applicationName, string applicationEnvInfo) : base(operationId, comment, changeType, applicationName, applicationEnvInfo)
         {
         }
 
         public WalletBalanceUpdateOperationInfoEntity(WalletBalanceUpdateOperationInfo info)
-        : this(info.Id, info.Comment, info.ChangeType, info.ApplicationName, info.ApplicationEnvInfo)
+        : this(info.OperationId, info.Comment, info.ChangeType, info.ApplicationName, info.ApplicationEnvInfo)
         {
         }
     }
