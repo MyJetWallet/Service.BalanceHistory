@@ -9,13 +9,14 @@ namespace Service.BalanceHistory.Domain.Models
         {
         }
 
-        public WalletBalanceUpdateOperationInfo(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo)
+        public WalletBalanceUpdateOperationInfo(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo, string changer)
         {
             OperationId = operationId;
             Comment = comment;
             ChangeType = changeType;
             ApplicationName = applicationName;
             ApplicationEnvInfo = applicationEnvInfo;
+            Changer = changer;
         }
 
         [DataMember(Order = 1)] public string OperationId { get; set; }
@@ -23,5 +24,6 @@ namespace Service.BalanceHistory.Domain.Models
         [DataMember(Order = 3)] public string ChangeType { get; set; }
         [DataMember(Order = 4)] public string ApplicationName { get; set; }
         [DataMember(Order = 5)] public string ApplicationEnvInfo { get; set; }
+        [DataMember(Order = 6)] public string Changer { get; set; }
     }
 }

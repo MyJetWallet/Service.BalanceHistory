@@ -42,7 +42,7 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.BrokerId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.Symbol).HasMaxLength(64);
-
+            
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new {e.SequenceId, e.WalletId, e.Symbol}).IsUnique();
 
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => e.WalletId);
@@ -60,6 +60,8 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ChangeType).HasMaxLength(128);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationEnvInfo).HasMaxLength(256);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.ApplicationName).HasMaxLength(256);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Changer).HasMaxLength(512);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Changer).IsRequired(false);
 
 
             base.OnModelCreating(modelBuilder);

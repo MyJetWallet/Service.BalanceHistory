@@ -27,10 +27,14 @@ namespace Service.BalanceHistory.Writer.Services
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
+                if (!string.IsNullOrEmpty(request.Changer) && request.Changer.Length > 512)
+                {
+                    request.Changer = request.Changer.Substring(0, 512);
+                }
+
                 var res = await ctx.UpsetAsync(new[] {new WalletBalanceUpdateOperationInfoEntity(request)});
 
-                _logger.LogInformation(
-                    $"Added WalletBalanceUpdateOperationInfo (affected: {res}). Request: {JsonConvert.SerializeObject(request)}");
+                _logger.LogInformation($"Added WalletBalanceUpdateOperationInfo (affected: {res}). Request: {JsonConvert.SerializeObject(request)}");
             }
             catch(Exception ex)
             {
