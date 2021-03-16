@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Service.BalanceHistory.Domain.Models;
 
 namespace Service.BalanceHistory.Postgres
 {
@@ -64,6 +65,7 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Changer).IsRequired(false);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.TxId).HasMaxLength(1024);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.TxId).IsRequired(false);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Status).HasDefaultValue(WalletBalanceUpdateOperationInfo.StatusEnum.Confirmed);
 
 
             base.OnModelCreating(modelBuilder);
@@ -77,7 +79,21 @@ namespace Service.BalanceHistory.Postgres
 
         public async Task<int> UpsetAsync(IEnumerable<WalletBalanceUpdateOperationInfoEntity> entities)
         {
-            var result = await OperationInfo.UpsertRange(entities).On(e => new {Id = e.OperationId}).NoUpdate().RunAsync();
+            var result = await OperationInfo
+                .UpsertRange(entities)
+                .On(e => new {Id = e.OperationId})
+                .WhenMatched((oldEntity, newEntity) => new WalletBalanceUpdateOperationInfoEntity()
+                {
+                    OperationId = newEntity.OperationId,
+                    Changer = newEntity.Changer,
+                    TxId = newEntity.TxId,
+                    Status = newEntity.Status,
+                    ApplicationEnvInfo = newEntity.ApplicationEnvInfo,
+                    ApplicationName = newEntity.ApplicationName,
+                    ChangeType = newEntity.ChangeType,
+                    Comment = newEntity.Comment
+                })
+                .RunAsync();
             return result;
         }
 
