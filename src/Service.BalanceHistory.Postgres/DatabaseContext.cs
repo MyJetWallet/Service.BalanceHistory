@@ -67,6 +67,7 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.TxId).HasMaxLength(1024);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.TxId).IsRequired(false);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Status).HasDefaultValue(TransactionStatus.Confirmed);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.WithdrawalAddress).HasMaxLength(512);
 
 
             base.OnModelCreating(modelBuilder);
