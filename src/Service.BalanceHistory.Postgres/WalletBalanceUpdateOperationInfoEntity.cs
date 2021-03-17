@@ -1,4 +1,5 @@
-﻿using Service.BalanceHistory.Domain.Models;
+﻿using MyJetWallet.Domain.Transactions;
+using Service.BalanceHistory.Domain.Models;
 
 namespace Service.BalanceHistory.Postgres
 {
@@ -9,7 +10,7 @@ namespace Service.BalanceHistory.Postgres
         }
 
         public WalletBalanceUpdateOperationInfoEntity(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo, string changer, 
-            string txId, StatusEnum status) 
+            string txId, TransactionStatus status) 
             : base(operationId, comment, changeType, applicationName, applicationEnvInfo, changer, txId, status)
         {
         }
