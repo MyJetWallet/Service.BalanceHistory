@@ -1,4 +1,5 @@
-﻿using MyJetWallet.Domain.Transactions;
+﻿using System.Runtime.Serialization;
+using MyJetWallet.Domain.Transactions;
 using Service.BalanceHistory.Domain.Models;
 
 namespace Service.BalanceHistory.Postgres
@@ -11,7 +12,7 @@ namespace Service.BalanceHistory.Postgres
 
         public WalletBalanceUpdateOperationInfoEntity(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo, string changer, 
             string txId, TransactionStatus status, string withdrawalAddress) 
-            : base(operationId, comment, changeType, applicationName, applicationEnvInfo, changer, txId, status, withdrawalAddress)
+            : base(operationId, comment, changeType, applicationName, applicationEnvInfo, changer, txId, status, withdrawalAddress, string.Empty)
         {
         }
 

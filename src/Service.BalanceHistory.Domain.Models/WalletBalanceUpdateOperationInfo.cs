@@ -11,7 +11,7 @@ namespace Service.BalanceHistory.Domain.Models
         }
 
         public WalletBalanceUpdateOperationInfo(string operationId, string comment, string changeType, string applicationName, string applicationEnvInfo, string changer, string txId,
-            TransactionStatus status, string withdrawalAddress)
+            TransactionStatus status, string withdrawalAddress, string rawData)
         {
             OperationId = operationId;
             Comment = comment;
@@ -22,6 +22,7 @@ namespace Service.BalanceHistory.Domain.Models
             TxId = txId;
             Status = status;
             WithdrawalAddress = withdrawalAddress;
+            RawData = rawData;
         }
 
         [DataMember(Order = 1)] public string OperationId { get; set; }
@@ -33,5 +34,6 @@ namespace Service.BalanceHistory.Domain.Models
         [DataMember(Order = 7)] public string TxId { get; set; }
         [DataMember(Order = 8)] public TransactionStatus Status { get; set; }
         [DataMember(Order = 9)] public string WithdrawalAddress { get; set; }
+        [DataMember(Order = 10)] public string RawData { get; set; }
     }
 }

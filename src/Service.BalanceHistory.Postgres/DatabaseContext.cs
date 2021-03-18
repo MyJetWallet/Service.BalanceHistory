@@ -13,9 +13,11 @@ namespace Service.BalanceHistory.Postgres
 
         public const string TradeHistoryTableName = "balance_history";
         public const string OperationInfoTableName = "operation_info";
+        public const string OperationInfoRawDataTableName = "operation_info_rawdata";
 
         public DbSet<BalanceHistoryEntity> BalanceHistory { get; set; }
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
+        public DbSet<WalletBalanceUpdateOperationRawDataEntity> OperationInfoRawData { get; set; }
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
@@ -68,7 +70,12 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.TxId).IsRequired(false);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Status).HasDefaultValue(TransactionStatus.Confirmed);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.WithdrawalAddress).HasMaxLength(512);
+            modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Ignore(e => e.RawData);
 
+            modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().ToTable(OperationInfoRawDataTableName);
+            modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().HasKey(e => e.OperationId);
+            modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().Property(e => e.OperationId).HasMaxLength(128);
+            modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().Property(e => e.RawData).HasMaxLength(5*1024);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -94,6 +101,20 @@ namespace Service.BalanceHistory.Postgres
                     ApplicationName = newEntity.ApplicationName,
                     ChangeType = newEntity.ChangeType,
                     Comment = newEntity.Comment
+                })
+                .RunAsync();
+            return result;
+        }
+
+        public async Task<int> UpsetAsync(IEnumerable<WalletBalanceUpdateOperationRawDataEntity> entities)
+        {
+            var result = await OperationInfoRawData
+                .UpsertRange(entities)
+                .On(e => new { Id = e.OperationId })
+                .WhenMatched((oldEntity, newEntity) => new WalletBalanceUpdateOperationRawDataEntity()
+                {
+                    OperationId = newEntity.OperationId,
+                    RawData = newEntity.RawData
                 })
                 .RunAsync();
             return result;

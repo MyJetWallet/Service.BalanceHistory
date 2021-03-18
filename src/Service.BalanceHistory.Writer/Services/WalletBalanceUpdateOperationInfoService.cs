@@ -27,14 +27,29 @@ namespace Service.BalanceHistory.Writer.Services
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
+                if (!string.IsNullOrEmpty(request.RawData) && request.RawData.Length > 5 * 1024)
+                {
+                    request.RawData = request.RawData.Substring(0, 5 * 1024);
+                }
+
                 if (!string.IsNullOrEmpty(request.Changer) && request.Changer.Length > 512)
                 {
                     request.Changer = request.Changer.Substring(0, 512);
                 }
 
                 var res = await ctx.UpsetAsync(new[] {new WalletBalanceUpdateOperationInfoEntity(request)});
-
                 _logger.LogInformation($"Added WalletBalanceUpdateOperationInfo (affected: {res}). Request: {JsonConvert.SerializeObject(request)}");
+
+                if (!string.IsNullOrEmpty(request.RawData))
+                {
+                    if (request.RawData.Length > 5 * 1024)
+                    {
+                        request.RawData = request.RawData.Substring(0, 5 * 1024);
+                    }
+
+                    res = await ctx.UpsetAsync(new[] {new WalletBalanceUpdateOperationRawDataEntity(request.OperationId, request.RawData)});
+                    _logger.LogInformation($"Added WalletBalanceUpdateOperationRawDataEntity (affected: {res}).");
+                }
             }
             catch(Exception ex)
             {
