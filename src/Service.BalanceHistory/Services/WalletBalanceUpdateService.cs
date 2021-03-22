@@ -45,6 +45,11 @@ namespace Service.BalanceHistory.Services
                     data = data.Where(e => e.Symbol == request.Symbol);
                 }
 
+                if (request.OnlyBalanceChanged)
+                {
+                    data = data.Where(e => e.IsBalanceChanged);
+                }
+
                 data = data.OrderByDescending(e => e.SequenceId).Take(take);
 
                 var list = await data.ToListAsync();
