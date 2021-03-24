@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Domain.Transactions;
 using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
+using Service.BalanceHistory.Grpc.Models;
 using Service.BalanceHistory.Postgres;
 
 namespace Service.BalanceHistory.Writer.Services
@@ -25,12 +28,9 @@ namespace Service.BalanceHistory.Writer.Services
         {
             try
             {
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                _logger.LogInformation("[WalletBalanceUpdateOperationInfo] Receive request: {jsonText}", JsonConvert.SerializeObject(request));
 
-                if (!string.IsNullOrEmpty(request.RawData) && request.RawData.Length > 5 * 1024)
-                {
-                    request.RawData = request.RawData.Substring(0, 5 * 1024);
-                }
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
                 if (!string.IsNullOrEmpty(request.Changer) && request.Changer.Length > 512)
                 {
@@ -38,7 +38,7 @@ namespace Service.BalanceHistory.Writer.Services
                 }
 
                 var res = await ctx.UpsetAsync(new[] {new WalletBalanceUpdateOperationInfoEntity(request)});
-                _logger.LogInformation($"Added WalletBalanceUpdateOperationInfo (affected: {res}). Request: {JsonConvert.SerializeObject(request)}");
+                _logger.LogInformation($"Added WalletBalanceUpdateOperationInfo (affected: {res}).");
 
                 if (!string.IsNullOrEmpty(request.RawData))
                 {
@@ -54,6 +54,51 @@ namespace Service.BalanceHistory.Writer.Services
             catch(Exception ex)
             {
                 _logger.LogError(ex, $"Cannot add WalletBalanceUpdateOperationInfo. Request: {JsonConvert.SerializeObject(request)}");
+            }
+        }
+
+        public async Task UpdateTransactionOperationInfoAsync(UpdateTransactionOperationInfoRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("[UpdateTransactionOperationInfoRequest] Receive request: {jsonText}", JsonConvert.SerializeObject(request));
+
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+                var info = await ctx.OperationInfo.FirstOrDefaultAsync(e => e.OperationId == request.OperationId);
+
+                if (info == null)
+                {
+                    _logger.LogInformation("[UpdateTransactionOperationInfoRequest] Do not found OperationInfo in database. OperationId: {operationId}", request.OperationId);
+
+                    info = new WalletBalanceUpdateOperationInfoEntity(request.OperationId, "", "", "", "", "",
+                        request.TxId, request.Status, "");
+
+                    await ctx.OperationInfo.AddAsync(info);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(request.TxId))
+                        info.TxId = request.TxId;
+
+                    if (info.Status != TransactionStatus.Confirmed)
+                        info.Status = request.Status;
+                }
+
+                if (!string.IsNullOrEmpty(request.RawData))
+                {
+                    if (request.RawData.Length > 5 * 1024)
+                    {
+                        request.RawData = request.RawData.Substring(0, 5 * 1024);
+                    }
+
+                    var res = await ctx.UpsetAsync(new[] { new WalletBalanceUpdateOperationRawDataEntity(request.OperationId, request.RawData) });
+                    _logger.LogInformation($"Added WalletBalanceUpdateOperationRawDataEntity (affected: {res}).");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Cannot UpdateTransactionOperationInfo. Request: {JsonConvert.SerializeObject(request)}");
             }
         }
     }

@@ -1,6 +1,7 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Service.BalanceHistory.Domain.Models;
+using Service.BalanceHistory.Grpc.Models;
 
 namespace Service.BalanceHistory.Grpc
 {
@@ -9,5 +10,8 @@ namespace Service.BalanceHistory.Grpc
     {
         [OperationContract]
         Task AddOperationInfoAsync(WalletBalanceUpdateOperationInfo request);
+
+        [OperationContract]
+        Task UpdateTransactionOperationInfoAsync(UpdateTransactionOperationInfoRequest request);
     }
 }
