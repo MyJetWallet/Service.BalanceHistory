@@ -3,6 +3,7 @@ using MyJetWallet.Domain.Transactions;
 
 namespace Service.BalanceHistory.Grpc.Models
 {
+    [DataContract]
     public class UpdateTransactionOperationInfoRequest
     {
         [DataMember(Order = 1)] public string OperationId { get; set; }
