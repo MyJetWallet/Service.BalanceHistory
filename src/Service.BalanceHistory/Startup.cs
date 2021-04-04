@@ -38,10 +38,21 @@ namespace Service.BalanceHistory
             if (!string.IsNullOrEmpty(Program.Settings.ZipkinUrl))
             {
                 services.AddOpenTelemetryTracing((builder) => builder
-                    .AddAspNetCoreInstrumentation()
+                    .AddAspNetCoreInstrumentation(options =>
+                    {
+                        options.Filter = context =>
+                        {
+                            if (context?.Request?.Path.Value?.Contains("metrics") == true) return false;
+                            if (context?.Request?.Path.Value?.Contains("isalive") == true) return false;
+                            if (context?.Request?.Path.Value?.Contains("metrics") == true) return false;
+
+                            return true;
+                        };
+                    })
                     .AddHttpClientInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddSqlClientInstrumentation()
+                    .AddGrpcCoreInstrumentation()
                     .AddZipkinExporter(options => { options.Endpoint = new Uri(Program.Settings.ZipkinUrl); })
                 );
                 Console.WriteLine($"+++ ZIPKIN is connected +++, {Program.Settings.ZipkinUrl}");
