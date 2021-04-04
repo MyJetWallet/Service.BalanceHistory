@@ -41,6 +41,7 @@ namespace Service.BalanceHistory
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddGrpcClientInstrumentation()
+                    .AddSqlClientInstrumentation()
                     .AddZipkinExporter(options => { options.Endpoint = new Uri(Program.Settings.ZipkinUrl); })
                 );
                 Console.WriteLine($"+++ ZIPKIN is connected +++, {Program.Settings.ZipkinUrl}");
