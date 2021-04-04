@@ -28,6 +28,11 @@
     <PackageReference Include="SimpleTrading.BaseMetrics" Version="1.0.3" />
     <PackageReference Include="SimpleTrading.ServiceStatusReporterConnector" Version="1.0.7" />
     <PackageReference Include="SimpleTrading.SettingsReader" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.1.0-beta1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc3" />
   </ItemGroup>
 
   <ItemGroup>

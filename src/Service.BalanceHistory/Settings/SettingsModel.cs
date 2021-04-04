@@ -10,5 +10,8 @@ namespace Service.BalanceHistory.Settings
 
         [YamlProperty("BalanceHistory.PostgresConnectionString")]
         public string PostgresConnectionString { get; set; }
+
+        [YamlProperty("BalanceHistory.ZipkinUrl")]
+        public string? ZipkinUrl { get; set; }
     }
 }
