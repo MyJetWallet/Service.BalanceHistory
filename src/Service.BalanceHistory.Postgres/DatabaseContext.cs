@@ -25,7 +25,7 @@ namespace Service.BalanceHistory.Postgres
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
-            _activity = MyTelemetry.StartActivity($"Database context {Schema}").AddTag("db-schema", Schema);
+            _activity = MyTelemetry.StartActivity($"Database context {Schema}")?.AddTag("db-schema", Schema);
         }
         public static ILoggerFactory LoggerFactory { get; set; }
 
