@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
+using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
@@ -63,6 +66,9 @@ namespace Service.BalanceHistory.Services
             {
                 _logger.LogError(e, "Cannot get BalanceUpdate for walletId: {walletId}, take: {takeValue}, LastSequenceId: {LastSequenceId}",
                     request.WalletId, take, request.LastSequenceId);
+                
+                e.WriteToActivity();
+                request.AddToActivityAsJsonTag("request");
 
                 throw;
             }

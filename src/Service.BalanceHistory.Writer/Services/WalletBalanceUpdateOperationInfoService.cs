@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain.Transactions;
+using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
@@ -53,6 +54,8 @@ namespace Service.BalanceHistory.Writer.Services
             }
             catch(Exception ex)
             {
+                ex.FailActivity();
+                request.AddToActivityAsJsonTag("request");
                 _logger.LogError(ex, $"Cannot add WalletBalanceUpdateOperationInfo. Request: {JsonConvert.SerializeObject(request)}");
             }
         }
@@ -98,6 +101,8 @@ namespace Service.BalanceHistory.Writer.Services
             }
             catch (Exception ex)
             {
+                ex.FailActivity();
+                request.AddToActivityAsJsonTag("request");
                 _logger.LogError(ex, $"Cannot UpdateTransactionOperationInfo. Request: {JsonConvert.SerializeObject(request)}");
             }
         }

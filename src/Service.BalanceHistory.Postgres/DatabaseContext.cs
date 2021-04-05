@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain.Transactions;
+using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Domain.Models;
 
 namespace Service.BalanceHistory.Postgres
@@ -19,8 +21,11 @@ namespace Service.BalanceHistory.Postgres
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
         public DbSet<WalletBalanceUpdateOperationRawDataEntity> OperationInfoRawData { get; set; }
 
+        private readonly Activity _activity;
+
         public DatabaseContext(DbContextOptions options) : base(options)
         {
+            _activity = MyTelemetry.StartActivity($"Database context {DatabaseContext.Schema}");
         }
         public static ILoggerFactory LoggerFactory { get; set; }
 
@@ -120,6 +125,10 @@ namespace Service.BalanceHistory.Postgres
             return result;
         }
 
-
+        public override void Dispose()
+        {
+            _activity.Dispose();
+            base.Dispose();
+        }
     }
 }

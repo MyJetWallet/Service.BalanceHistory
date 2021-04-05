@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Postgres;
 
 namespace Service.BalanceHistory.Writer.Services
@@ -28,59 +29,73 @@ namespace Service.BalanceHistory.Writer.Services
 
         private async ValueTask HandleEvents(IReadOnlyList<ME.Contracts.OutgoingMessages.OutgoingEvent> events)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            var list = new List<BalanceHistoryEntity>();
-
-            foreach (var meEvent in events)
+            using var activity = MyTelemetry.StartActivity("Handle ME OutgoingEvent's")?.AddTag("count-events", events.Count);
+            try
             {
-                foreach (var update in meEvent.BalanceUpdates)
+
+                var sw = new Stopwatch();
+                sw.Start();
+
+                var list = new List<BalanceHistoryEntity>();
+
+                var index = 1;
+                foreach (var meEvent in events)
                 {
-                    var newBalance = decimal.Parse(update.NewBalance);
-                    var oldBalance = decimal.Parse(update.OldBalance);
-                    var newReserve = decimal.Parse(update.NewReserved);
-                    var oldReserve = decimal.Parse(update.OldReserved);
-                    var amountBalance = newBalance - oldBalance;
-                    var amountReserve = newReserve - oldReserve;
-                    var availableBalance = newBalance - newReserve;
-
-
-                    var entity = new BalanceHistoryEntity()
+                    foreach (var update in meEvent.BalanceUpdates)
                     {
-                        BrokerId = update.BrokerId,
-                        ClientId = update.AccountId,
-                        WalletId = update.WalletId,
-                        Symbol = update.AssetId,
-                        EventType = meEvent.Header.EventType,
-                        SequenceId = meEvent.Header.SequenceNumber,
-                        OperationId = meEvent.Header.RequestId,
-                        Timestamp = meEvent.Header.Timestamp.ToDateTime(),
+                        var newBalance = decimal.Parse(update.NewBalance);
+                        var oldBalance = decimal.Parse(update.OldBalance);
+                        var newReserve = decimal.Parse(update.NewReserved);
+                        var oldReserve = decimal.Parse(update.OldReserved);
+                        var amountBalance = newBalance - oldBalance;
+                        var amountReserve = newReserve - oldReserve;
+                        var availableBalance = newBalance - newReserve;
 
-                        NewBalance = (double) newBalance,
-                        OldBalance = (double) oldBalance,
-                        NewReserve = (double) newReserve,
-                        OldReserve = (double) oldReserve,
 
-                        AmountBalance = (double)amountBalance,
-                        AmountReserve = (double)amountReserve,
+                        var entity = new BalanceHistoryEntity()
+                        {
+                            BrokerId = update.BrokerId,
+                            ClientId = update.AccountId,
+                            WalletId = update.WalletId,
+                            Symbol = update.AssetId,
+                            EventType = meEvent.Header.EventType,
+                            SequenceId = meEvent.Header.SequenceNumber,
+                            OperationId = meEvent.Header.RequestId,
+                            Timestamp = meEvent.Header.Timestamp.ToDateTime(),
 
-                        AvailableBalance = (double) availableBalance,
+                            NewBalance = (double) newBalance,
+                            OldBalance = (double) oldBalance,
+                            NewReserve = (double) newReserve,
+                            OldReserve = (double) oldReserve,
 
-                        IsBalanceChanged = amountBalance != 0
-                    };
+                            AmountBalance = (double) amountBalance,
+                            AmountReserve = (double) amountReserve,
 
-                    list.Add(entity);
+                            AvailableBalance = (double) availableBalance,
+
+                            IsBalanceChanged = amountBalance != 0
+                        };
+
+                        list.Add(entity);
+                    }
                 }
+
+                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+
+                await ctx.UpsetAsync(list).ConfigureAwait(false);
+
+                sw.Stop();
+
+                _logger.LogDebug(
+                    "Write {countUpdates} balance updates in database from {countEvents} ME events. Time: {elapsedText} [{elapsedMilliseconds} ms]",
+                    list.Count, events.Count, sw.Elapsed.ToString(), sw.ElapsedMilliseconds);
             }
-
-            await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
-
-            await ctx.UpsetAsync(list).ConfigureAwait(false);
-
-            sw.Stop();
-
-            _logger.LogDebug("Write {countUpdates} balance updates in database from {countEvents} ME events. Time: {elapsedText} [{elapsedMilliseconds} ms]", list.Count, events.Count, sw.Elapsed.ToString(), sw.ElapsedMilliseconds);
+            catch (Exception ex)
+            {
+                ex.FailActivity();
+                events.AddToActivityAsJsonTag("me events");
+                throw;
+            }
 
         }
     }

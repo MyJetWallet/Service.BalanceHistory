@@ -9,7 +9,7 @@ using Autofac;
 using MyJetWallet.Sdk.GrpcMetrics;
 using MyJetWallet.Sdk.GrpcSchema;
 using MyJetWallet.Sdk.Postgres;
-using OpenTelemetry.Trace;
+using MyJetWallet.Sdk.Service;
 using Prometheus;
 using ProtoBuf.Grpc.Server;
 using Service.BalanceHistory.Grpc;
@@ -35,28 +35,7 @@ namespace Service.BalanceHistory
 
             services.AddDatabaseWithoutMigrations<DatabaseContext>(DatabaseContext.Schema, Program.Settings.PostgresConnectionString);
 
-            if (!string.IsNullOrEmpty(Program.Settings.ZipkinUrl))
-            {
-                services.AddOpenTelemetryTracing((builder) => builder
-                    .AddAspNetCoreInstrumentation(options =>
-                    {
-                        options.Filter = context =>
-                        {
-                            if (context?.Request?.Path.Value?.Contains("metrics") == true) return false;
-                            if (context?.Request?.Path.Value?.Contains("isalive") == true) return false;
-                            if (context?.Request?.Path.Value?.Contains("metrics") == true) return false;
-
-                            return true;
-                        };
-                    })
-                    .AddHttpClientInstrumentation()
-                    .AddGrpcClientInstrumentation()
-                    .AddSqlClientInstrumentation()
-                    .AddGrpcCoreInstrumentation()
-                    .AddZipkinExporter(options => { options.Endpoint = new Uri(Program.Settings.ZipkinUrl); })
-                );
-                Console.WriteLine($"+++ ZIPKIN is connected +++, {Program.Settings.ZipkinUrl}");
-            }
+            services.AddMyTelemetry(Program.Settings.ZipkinUrl);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
