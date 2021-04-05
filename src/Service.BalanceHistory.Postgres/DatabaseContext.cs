@@ -127,7 +127,7 @@ namespace Service.BalanceHistory.Postgres
 
         public override void Dispose()
         {
-            _activity.Dispose();
+            _activity?.Dispose();
             base.Dispose();
         }
     }
