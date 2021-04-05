@@ -45,7 +45,7 @@ namespace Service.BalanceHistory.Writer.Services
                     foreach (var update in meEvent.BalanceUpdates)
                     {
                         using var _ = MyTelemetry.StartActivity("Update balance")
-                                .AddTag("brokerId", update.BrokerId)
+                                ?.AddTag("brokerId", update.BrokerId)
                                 .AddTag("clientId", update.AccountId)
                                 .AddTag("walletId", update.WalletId)
                                 .AddTag("symbol", update.AssetId);
