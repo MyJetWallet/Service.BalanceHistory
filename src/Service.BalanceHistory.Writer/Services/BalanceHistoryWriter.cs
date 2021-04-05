@@ -40,11 +40,16 @@ namespace Service.BalanceHistory.Writer.Services
 
                 var list = new List<BalanceHistoryEntity>();
 
-                var index = 1;
                 foreach (var meEvent in events)
                 {
                     foreach (var update in meEvent.BalanceUpdates)
                     {
+                        using var _ = MyTelemetry.StartActivity("Update balance")
+                                .AddTag("brokerId", update.BrokerId)
+                                .AddTag("clientId", update.AccountId)
+                                .AddTag("walletId", update.WalletId)
+                                .AddTag("symbol", update.AssetId);
+
                         var newBalance = decimal.Parse(update.NewBalance);
                         var oldBalance = decimal.Parse(update.OldBalance);
                         var newReserve = decimal.Parse(update.NewReserved);
@@ -52,6 +57,8 @@ namespace Service.BalanceHistory.Writer.Services
                         var amountBalance = newBalance - oldBalance;
                         var amountReserve = newReserve - oldReserve;
                         var availableBalance = newBalance - newReserve;
+
+                        
 
 
                         var entity = new BalanceHistoryEntity()
