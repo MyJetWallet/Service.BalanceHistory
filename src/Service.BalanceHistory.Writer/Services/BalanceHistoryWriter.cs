@@ -13,6 +13,8 @@ namespace Service.BalanceHistory.Writer.Services
 {
     public class BalanceHistoryWriter
     {
+        public static DbContextOptions Options { get; set; }
+
         private readonly ILogger<BalanceHistoryWriter> _logger;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
 
@@ -80,7 +82,7 @@ namespace Service.BalanceHistory.Writer.Services
                     }
                 }
 
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
 
                 await ctx.UpsetAsync(list).ConfigureAwait(false);
 

@@ -34,7 +34,9 @@ namespace Service.BalanceHistory.Services
 
             try
             {
-                await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
+                using var activity = MyTelemetry.StartActivity($"Use DB context {DatabaseContext.Schema}")?.AddTag("db-schema", DatabaseContext.Schema);
+
+                await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
 
                 var data = ctx.BalanceHistory.Where(e => e.WalletId == request.WalletId);
 

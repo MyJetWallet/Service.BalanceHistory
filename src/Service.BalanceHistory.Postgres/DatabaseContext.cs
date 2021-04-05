@@ -11,6 +11,15 @@ namespace Service.BalanceHistory.Postgres
 {
     public class DatabaseContext : DbContext
     {
+        public static DatabaseContext Create(DbContextOptionsBuilder<DatabaseContext> options)
+        {
+            var activity = MyTelemetry.StartActivity($"Database context {Schema}")?.AddTag("db-schema", Schema);
+
+            var ctx = new DatabaseContext(options.Options) {_activity = activity};
+
+            return ctx;
+        }
+
         public const string Schema = "balancehistory";
 
         public const string TradeHistoryTableName = "balance_history";
@@ -21,11 +30,10 @@ namespace Service.BalanceHistory.Postgres
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
         public DbSet<WalletBalanceUpdateOperationRawDataEntity> OperationInfoRawData { get; set; }
 
-        private readonly Activity _activity;
+        private Activity _activity;
 
         public DatabaseContext(DbContextOptions options) : base(options)
         {
-            _activity = MyTelemetry.StartActivity($"Database context {Schema}")?.AddTag("db-schema", Schema);
         }
         public static ILoggerFactory LoggerFactory { get; set; }
 
