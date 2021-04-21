@@ -11,7 +11,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="1.1.0" />
-    <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.3.0" />
+    <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.3.11" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.5" />
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
   </ItemGroup>
