@@ -57,6 +57,8 @@ namespace Service.BalanceHistory.Services
 
                 data = data.OrderByDescending(e => e.SequenceId).Take(take);
 
+                data = data.Include(e => e.Info);
+
                 var list = await data.ToListAsync();
 
                 var resp = new WalletBalanceUpdateList { BalanceUpdates = new List<WalletBalanceUpdate>() };

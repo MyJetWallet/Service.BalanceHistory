@@ -90,6 +90,12 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().Property(e => e.OperationId).HasMaxLength(128);
             modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().Property(e => e.RawData).HasMaxLength(5*1024);
 
+            modelBuilder.Entity<BalanceHistoryEntity>()
+                .HasOne(e => e.Info)
+                .WithOne(e => e.Balance)
+                .HasForeignKey<WalletBalanceUpdateOperationInfoEntity>(b => b.OperationId)
+                .HasPrincipalKey<BalanceHistoryEntity>(e => e.OperationId);
+
             base.OnModelCreating(modelBuilder);
         }
 

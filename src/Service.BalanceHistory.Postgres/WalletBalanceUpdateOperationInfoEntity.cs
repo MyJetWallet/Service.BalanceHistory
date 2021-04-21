@@ -6,6 +6,8 @@ namespace Service.BalanceHistory.Postgres
 {
     public class WalletBalanceUpdateOperationInfoEntity : WalletBalanceUpdateOperationInfo
     {
+        public BalanceHistoryEntity Balance { get; set; }
+
         public WalletBalanceUpdateOperationInfoEntity()
         {
         }

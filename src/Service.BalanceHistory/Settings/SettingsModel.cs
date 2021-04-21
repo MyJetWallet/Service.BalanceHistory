@@ -14,7 +14,7 @@ namespace Service.BalanceHistory.Settings
         [YamlProperty("BalanceHistory.ZipkinUrl")]
         public string? ZipkinUrl { get; set; }
 
-        [YamlProperty("LiquidityEngine.ElkLogs")]
+        [YamlProperty("BalanceHistory.ElkLogs")]
         public LogElkSettings ElkLogs { get; set; }
     }
 }

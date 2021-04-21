@@ -9,6 +9,8 @@ namespace Service.BalanceHistory.Postgres
         public string ClientId { get; set; }
 
         public string WalletId { get; set; }
-        
+
+        public WalletBalanceUpdateOperationInfoEntity Info { get; set; }
+
     }
 }
