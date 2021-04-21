@@ -1,8 +1,8 @@
-﻿using SimpleTrading.SettingsReader;
+﻿using MyJetWallet.Sdk.Service;
+using MyYamlParser;
 
 namespace Service.BalanceHistory.Settings
 {
-    [YamlAttributesOnly]
     public class SettingsModel
     {
         [YamlProperty("BalanceHistory.SeqServiceUrl")]
@@ -13,5 +13,8 @@ namespace Service.BalanceHistory.Settings
 
         [YamlProperty("BalanceHistory.ZipkinUrl")]
         public string? ZipkinUrl { get; set; }
+
+        [YamlProperty("LiquidityEngine.ElkLogs")]
+        public LogElkSettings ElkLogs { get; set; }
     }
 }
