@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.EntityFrameworkCore;
@@ -58,9 +57,6 @@ namespace Service.BalanceHistory.Writer.Services
                         var amountBalance = newBalance - oldBalance;
                         var amountReserve = newReserve - oldReserve;
                         var availableBalance = newBalance - newReserve;
-
-                        
-
 
                         var entity = new BalanceHistoryEntity()
                         {

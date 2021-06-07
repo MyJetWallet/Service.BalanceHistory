@@ -31,14 +31,33 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     NewReserve = table.Column<double>(type: "double precision", nullable: false),
                     SequenceId = table.Column<long>(type: "bigint", nullable: false),
                     EventType = table.Column<string>(type: "text", nullable: true),
-                    OperationId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    OperationId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     AvailableBalance = table.Column<double>(type: "double precision", nullable: false),
                     IsBalanceChanged = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_balance_history", x => x.Id);
-                    table.UniqueConstraint("AK_balance_history_OperationId", x => x.OperationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "operation_info",
+                schema: "balancehistory",
+                columns: table => new
+                {
+                    OperationId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: true),
+                    ChangeType = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    ApplicationName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ApplicationEnvInfo = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Changer = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    TxId = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 2),
+                    WithdrawalAddress = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_operation_info", x => x.OperationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,6 +71,28 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_operation_info_rawdata", x => x.OperationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "swap_history",
+                schema: "balancehistory",
+                columns: table => new
+                {
+                    OperationId = table.Column<string>(type: "text", nullable: false),
+                    WalletId = table.Column<string>(type: "text", nullable: false),
+                    Number = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EventDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    SequenceNumber = table.Column<long>(type: "bigint", nullable: false),
+                    AccountId = table.Column<string>(type: "text", nullable: true),
+                    FromAsset = table.Column<string>(type: "text", nullable: true),
+                    ToAsset = table.Column<string>(type: "text", nullable: true),
+                    FromVolume = table.Column<string>(type: "text", nullable: true),
+                    ToVolume = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_swap_history", x => new { x.OperationId, x.WalletId });
                 });
 
             migrationBuilder.CreateTable(
@@ -79,33 +120,6 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_trade_history", x => x.TradeId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "operation_info",
-                schema: "balancehistory",
-                columns: table => new
-                {
-                    OperationId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Comment = table.Column<string>(type: "text", nullable: true),
-                    ChangeType = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    ApplicationName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    ApplicationEnvInfo = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Changer = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
-                    TxId = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
-                    Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 2),
-                    WithdrawalAddress = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_operation_info", x => x.OperationId);
-                    table.ForeignKey(
-                        name: "FK_operation_info_balance_history_OperationId",
-                        column: x => x.OperationId,
-                        principalSchema: "balancehistory",
-                        principalTable: "balance_history",
-                        principalColumn: "OperationId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -152,6 +166,18 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 columns: new[] { "WalletId", "Symbol", "SequenceId" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_swap_history_Number",
+                schema: "balancehistory",
+                table: "swap_history",
+                column: "Number");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_swap_history_OperationId_WalletId",
+                schema: "balancehistory",
+                table: "swap_history",
+                columns: new[] { "OperationId", "WalletId" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_trade_history_SequenceId",
                 schema: "balancehistory",
                 table: "trade_history",
@@ -192,6 +218,10 @@ namespace Service.BalanceHistory.Postgres.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "balance_history",
+                schema: "balancehistory");
+
+            migrationBuilder.DropTable(
                 name: "operation_info",
                 schema: "balancehistory");
 
@@ -200,11 +230,11 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 schema: "balancehistory");
 
             migrationBuilder.DropTable(
-                name: "trade_history",
+                name: "swap_history",
                 schema: "balancehistory");
 
             migrationBuilder.DropTable(
-                name: "balance_history",
+                name: "trade_history",
                 schema: "balancehistory");
         }
     }

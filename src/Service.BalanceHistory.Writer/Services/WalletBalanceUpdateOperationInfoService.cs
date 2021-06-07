@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
 using Service.BalanceHistory.Postgres;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Writer.Services
 {

@@ -32,6 +32,7 @@ namespace Service.BalanceHistory.Writer
 
             services.AddHostedService<ApplicationLifetimeManager>();
 
+            DatabaseContext.LoggerFactory = Program.LogFactory;
             services.AddDatabase(DatabaseContext.Schema, Program.Settings.PostgresConnectionString, o => new DatabaseContext(o));
 
             services.AddMyTelemetry("SP-", Program.Settings.ZipkinUrl);

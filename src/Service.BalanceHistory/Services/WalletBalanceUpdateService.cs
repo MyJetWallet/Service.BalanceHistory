@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
-using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
@@ -38,31 +37,40 @@ namespace Service.BalanceHistory.Services
 
                 await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
 
-                var data = ctx.BalanceHistory.Where(e => e.WalletId == request.WalletId);
 
+                var data = ctx
+                    .BalanceHistory.LeftJoin(ctx.OperationInfo,
+                        bs => bs.OperationId,
+                        info => info.OperationId,
+                        (bs, info) => new
+                        {
+                            History = bs,
+                            Info = info
+                        }).Where(elem => elem.History.WalletId == request.WalletId);
+                
                 if (request.LastSequenceId.HasValue)
                 {
-                    data = data.Where(e => e.SequenceId < request.LastSequenceId);
+                    data = data.Where(e => e.History.SequenceId < request.LastSequenceId);
                 }
 
                 if (!string.IsNullOrEmpty(request.Symbol))
                 {
-                    data = data.Where(e => e.Symbol == request.Symbol);
+                    data = data.Where(e => e.History.Symbol == request.Symbol);
                 }
 
                 if (request.OnlyBalanceChanged)
                 {
-                    data = data.Where(e => e.IsBalanceChanged);
+                    data = data.Where(e => e.History.IsBalanceChanged);
                 }
 
-                data = data.OrderByDescending(e => e.SequenceId).Take(take);
+                data = data.OrderByDescending(e => e.History.SequenceId).Take(take);
 
                 data = data.Include(e => e.Info);
 
                 var list = await data.ToListAsync();
 
                 var resp = new WalletBalanceUpdateList { BalanceUpdates = new List<WalletBalanceUpdate>() };
-                resp.BalanceUpdates.AddRange(list.Select(e => new WalletBalanceUpdate(e)));
+                resp.BalanceUpdates.AddRange(list.Select(e => new WalletBalanceUpdate(e.History)));
 
                 return resp;
             }

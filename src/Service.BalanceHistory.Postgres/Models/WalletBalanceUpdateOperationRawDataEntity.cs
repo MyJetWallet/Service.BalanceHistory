@@ -1,4 +1,4 @@
-﻿namespace Service.BalanceHistory.Postgres
+﻿namespace Service.BalanceHistory.Postgres.Models
 {
     public class WalletBalanceUpdateOperationRawDataEntity
     {

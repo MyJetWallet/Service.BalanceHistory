@@ -1,14 +1,10 @@
-﻿using System.Runtime.Serialization;
-using MyJetWallet.Domain.Transactions;
+﻿using MyJetWallet.Domain.Transactions;
 using Service.BalanceHistory.Domain.Models;
-using Service.BalanceHistory.Postgres.Models;
 
-namespace Service.BalanceHistory.Postgres
+namespace Service.BalanceHistory.Postgres.Models
 {
     public class WalletBalanceUpdateOperationInfoEntity : WalletBalanceUpdateOperationInfo
     {
-        public BalanceHistoryEntity Balance { get; set; }
-
         public WalletBalanceUpdateOperationInfoEntity()
         {
         }

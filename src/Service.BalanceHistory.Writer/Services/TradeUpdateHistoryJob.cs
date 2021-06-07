@@ -41,9 +41,7 @@ namespace Service.BalanceHistory.Writer.Services
             {
                 var sw = new Stopwatch();
                 sw.Start();
-
-
-
+                
                 var trades = events
                     .SelectMany(e => e.Orders.Select(i => new {e.Header.SequenceNumber, Order = i}))
                     .Where(e => e.Order.Trades.Any());
@@ -89,7 +87,6 @@ namespace Service.BalanceHistory.Writer.Services
                         await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
                         await ctx.UpsetAsync(list);
                     }
-
 
                     using (var _ = MyTelemetry.StartActivity("Publish trade events"))
                     {
