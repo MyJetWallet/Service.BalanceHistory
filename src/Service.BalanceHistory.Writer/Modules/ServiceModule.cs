@@ -42,10 +42,10 @@ namespace Service.BalanceHistory.Writer.Modules
                 .AutoActivate()
                 .SingleInstance();
             
-            builder
-                .RegisterType<SwapHistoryJob>()
-                .AutoActivate()
-                .SingleInstance();
+            //builder
+            //    .RegisterType<SwapHistoryJob>()
+            //    .AutoActivate()
+            //    .SingleInstance();
         }
     }
 }
