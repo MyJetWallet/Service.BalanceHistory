@@ -1,8 +1,10 @@
 ﻿using Autofac;
+using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
+using Service.BalanceHistory.ServiceBus;
 using Service.BalanceHistory.Writer.Services;
 using Service.MatchingEngine.EventBridge.ServiceBus;
 
@@ -24,12 +26,26 @@ namespace Service.BalanceHistory.Writer.Modules
 
             builder.RegisterInstance(serviceBusClient).AsSelf().SingleInstance();
             builder.RegisterMeEventSubscriber(serviceBusClient, "balance-history", TopicQueueType.Permanent);
-
+            
+            builder
+                .RegisterInstance(new WalletTradeServiceBusPublisher(serviceBusClient))
+                .As<IPublisher<WalletTradeMessage>>()
+                .SingleInstance();
+            
             builder
                 .RegisterType<BalanceHistoryWriter>()
                 .AutoActivate()
                 .SingleInstance();
-
+            
+            builder
+                .RegisterType<TradeUpdateHistoryJob>()
+                .AutoActivate()
+                .SingleInstance();
+            
+            builder
+                .RegisterType<SwapHistoryJob>()
+                .AutoActivate()
+                .SingleInstance();
         }
     }
 }
