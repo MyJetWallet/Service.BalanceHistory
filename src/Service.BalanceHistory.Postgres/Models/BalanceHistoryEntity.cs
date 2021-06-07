@@ -1,6 +1,6 @@
 ﻿using Service.BalanceHistory.Domain.Models;
 
-namespace Service.BalanceHistory.Postgres
+namespace Service.BalanceHistory.Postgres.Models
 {
     public class BalanceHistoryEntity: WalletBalanceUpdate
     {

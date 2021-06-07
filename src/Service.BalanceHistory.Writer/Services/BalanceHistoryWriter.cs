@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Postgres;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Writer.Services
 {

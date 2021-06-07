@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Service.BalanceHistory.Grpc.Models;
@@ -6,9 +5,12 @@ using Service.BalanceHistory.Grpc.Models;
 namespace Service.BalanceHistory.Grpc
 {
     [ServiceContract]
-    public interface IWalletBalanceUpdateService
+    public interface IWalletTradeService
     {
         [OperationContract]
-        Task<WalletBalanceUpdateList> GetBalanceUpdatesAsync(GetBalanceUpdateRequest request);
+        Task<WalletTradeList> GetTradesAsync(GetTradesRequest request);
+
+        [OperationContract]
+        Task<WalletTradeList> GetSingleTradesAsync(GetSingleTradesRequest request);
     }
 }

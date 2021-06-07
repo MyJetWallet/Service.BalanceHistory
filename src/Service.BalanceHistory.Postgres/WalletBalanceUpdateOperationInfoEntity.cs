@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using MyJetWallet.Domain.Transactions;
 using Service.BalanceHistory.Domain.Models;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Postgres
 {

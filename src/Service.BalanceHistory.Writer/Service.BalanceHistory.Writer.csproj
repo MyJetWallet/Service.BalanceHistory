@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Service.BalanceHistory.ServiceBus\Service.BalanceHistory.ServiceBus.csproj" />
     <ProjectReference Include="..\Service.BalanceHistory.Grpc\Service.BalanceHistory.Grpc.csproj" />
     <ProjectReference Include="..\Service.BalanceHistory.Postgres\Service.BalanceHistory.Postgres.csproj" />
   </ItemGroup>

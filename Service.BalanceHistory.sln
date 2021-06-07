@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.BalanceHistory.Post
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.BalanceHistory.Writer", "src\Service.BalanceHistory.Writer\Service.BalanceHistory.Writer.csproj", "{790E3BC1-90CE-40E8-AE58-F1C8B4EB15BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BalanceHistory.ServiceBus", "Service.BalanceHistory.ServiceBus\Service.BalanceHistory.ServiceBus.csproj", "{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{790E3BC1-90CE-40E8-AE58-F1C8B4EB15BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{790E3BC1-90CE-40E8-AE58-F1C8B4EB15BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{790E3BC1-90CE-40E8-AE58-F1C8B4EB15BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{B64315EC-2356-4586-8A89-111D88A942B8} = {EB832FF1-4E01-40ED-BAC4-5ECF70F5C108}
 		{FF868A2B-24FA-42B0-8400-95EDEE689678} = {D11EB899-A148-4C9B-B340-B907EF71C4A2}
 		{DB855C78-895E-46E9-8767-0B35B31705C6} = {446301A0-97F2-4921-BA0B-32B76039C73B}
+		{CE173AF7-535E-4C2A-82CF-A6BEAE3B6136} = {446301A0-97F2-4921-BA0B-32B76039C73B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6BF00C9D-AD55-40F2-8FE3-E5C3559B3E26}

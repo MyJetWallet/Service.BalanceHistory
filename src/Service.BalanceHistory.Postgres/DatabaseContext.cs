@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain.Transactions;
 using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Domain.Models;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Postgres
 {
@@ -22,10 +23,12 @@ namespace Service.BalanceHistory.Postgres
 
         public const string Schema = "balancehistory";
 
-        public const string TradeHistoryTableName = "balance_history";
+        public const string TradeHistoryTableName = "trade_history";
+        public const string BalanceHistoryTableName = "balance_history";
         public const string OperationInfoTableName = "operation_info";
         public const string OperationInfoRawDataTableName = "operation_info_rawdata";
 
+        public DbSet<TradeHistoryEntity> Trades { get; set; }
         public DbSet<BalanceHistoryEntity> BalanceHistory { get; set; }
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
         public DbSet<WalletBalanceUpdateOperationRawDataEntity> OperationInfoRawData { get; set; }
@@ -50,21 +53,34 @@ namespace Service.BalanceHistory.Postgres
         {
             modelBuilder.HasDefaultSchema(Schema);
 
-            modelBuilder.Entity<BalanceHistoryEntity>().ToTable(TradeHistoryTableName);
+            modelBuilder.Entity<TradeHistoryEntity>().ToTable(TradeHistoryTableName);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.TradeId).UseIdentityColumn();
+            modelBuilder.Entity<TradeHistoryEntity>().HasKey(e => e.TradeId);
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => e.TradeUId).IsUnique();
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => e.TradeUId);
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => e.WalletId);
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => new {e.WalletId, e.InstrumentSymbol});
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => new { e.WalletId, e.SequenceId });
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => new { e.WalletId, e.InstrumentSymbol, e.SequenceId });
+            modelBuilder.Entity<TradeHistoryEntity>().HasIndex(e => e.SequenceId);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.OrderId).HasMaxLength(128);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.WalletId).HasMaxLength(128);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.ClientId).HasMaxLength(128);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.BrokerId).HasMaxLength(128);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.InstrumentSymbol).HasMaxLength(64);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.TradeUId).HasMaxLength(128);
+            
+            modelBuilder.Entity<BalanceHistoryEntity>().ToTable(BalanceHistoryTableName);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.Id).UseIdentityColumn();
             modelBuilder.Entity<BalanceHistoryEntity>().HasKey(e => e.Id);
-
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.OperationId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.WalletId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.BrokerId).HasMaxLength(128);
             modelBuilder.Entity<BalanceHistoryEntity>().Property(e => e.Symbol).HasMaxLength(64);
-            
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new {e.SequenceId, e.WalletId, e.Symbol}).IsUnique();
-
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => e.WalletId);
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new { e.WalletId, e.Symbol });
-
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new { e.WalletId, e.SequenceId });
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => new { e.WalletId, e.Symbol, e.SequenceId });
             modelBuilder.Entity<BalanceHistoryEntity>().HasIndex(e => e.SequenceId);
@@ -84,7 +100,6 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.Status).HasDefaultValue(TransactionStatus.Confirmed);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Property(e => e.WithdrawalAddress).HasMaxLength(512);
             modelBuilder.Entity<WalletBalanceUpdateOperationInfoEntity>().Ignore(e => e.RawData);
-
             modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().ToTable(OperationInfoRawDataTableName);
             modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().HasKey(e => e.OperationId);
             modelBuilder.Entity<WalletBalanceUpdateOperationRawDataEntity>().Property(e => e.OperationId).HasMaxLength(128);
@@ -97,6 +112,12 @@ namespace Service.BalanceHistory.Postgres
                 .HasPrincipalKey<BalanceHistoryEntity>(e => e.OperationId);
 
             base.OnModelCreating(modelBuilder);
+        }
+        
+        public async Task<int> UpsetAsync(IEnumerable<TradeHistoryEntity> entities)
+        {
+            var result = await Trades.UpsertRange(entities).On(e => e.TradeUId).NoUpdate().RunAsync();
+            return result;
         }
 
         public async Task<int> UpsetAsync(IEnumerable<BalanceHistoryEntity> entities)

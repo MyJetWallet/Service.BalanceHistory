@@ -24,5 +24,7 @@ namespace Service.BalanceHistory.Client
         public IWalletBalanceUpdateService GetWalletBalanceUpdateService() => _channel.CreateGrpcService<IWalletBalanceUpdateService>();
 
         public IWalletBalanceUpdateOperationInfoService GetWalletBalanceUpdateOperationInfoService() => _channel.CreateGrpcService<IWalletBalanceUpdateOperationInfoService>();
+        
+        public IWalletTradeService GetWalletTradeService() => _channel.CreateGrpcService<IWalletTradeService>();
     }
 }

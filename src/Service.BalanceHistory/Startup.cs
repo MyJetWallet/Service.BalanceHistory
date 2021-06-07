@@ -56,6 +56,7 @@ namespace Service.BalanceHistory
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcSchema<WalletBalanceUpdateService, IWalletBalanceUpdateService>();
+                endpoints.MapGrpcSchema<WalletTradeService, IWalletTradeService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 

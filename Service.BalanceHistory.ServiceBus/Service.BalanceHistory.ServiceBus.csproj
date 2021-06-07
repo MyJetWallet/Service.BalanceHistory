@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\src\Service.BalanceHistory.Domain.Models\Service.BalanceHistory.Domain.Models.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MyJetWallet.Domain.ServiceBus" Version="1.2.0" />
+      <PackageReference Include="MyJetWallet.Service.MatchingEngine.EventBridge.ServiceBus" Version="1.2.2" />
+    </ItemGroup>
+
+</Project>

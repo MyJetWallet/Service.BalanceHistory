@@ -10,8 +10,8 @@ using Service.BalanceHistory.Postgres;
 namespace Service.BalanceHistory.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210311182902_ver_2")]
-    partial class ver_2
+    [Migration("20210607115501_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,10 +19,10 @@ namespace Service.BalanceHistory.Postgres.Migrations
             modelBuilder
                 .HasDefaultSchema("balancehistory")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("ProductVersion", "5.0.6")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("Service.BalanceHistory.Postgres.BalanceHistoryEntity", b =>
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.BalanceHistoryEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,6 +65,7 @@ namespace Service.BalanceHistory.Postgres.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<string>("OperationId")
+                        .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
@@ -102,6 +103,79 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     b.ToTable("balance_history");
                 });
 
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.TradeHistoryEntity", b =>
+                {
+                    b.Property<long>("TradeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<double>("BaseVolume")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("BrokerId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("ClientId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("InstrumentSymbol")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("OrderId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<double>("OrderVolume")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("QuoteVolume")
+                        .HasColumnType("double precision");
+
+                    b.Property<long>("SequenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Side")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TradeUId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("WalletId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("TradeId");
+
+                    b.HasIndex("SequenceId");
+
+                    b.HasIndex("TradeUId")
+                        .IsUnique();
+
+                    b.HasIndex("WalletId");
+
+                    b.HasIndex("WalletId", "InstrumentSymbol");
+
+                    b.HasIndex("WalletId", "SequenceId");
+
+                    b.HasIndex("WalletId", "InstrumentSymbol", "SequenceId");
+
+                    b.ToTable("trade_history");
+                });
+
             modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", b =>
                 {
                     b.Property<string>("OperationId")
@@ -127,13 +201,54 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("text");
 
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<string>("TxId")
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
+                    b.Property<string>("WithdrawalAddress")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
                     b.HasKey("OperationId");
 
                     b.ToTable("operation_info");
+                });
+
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationRawDataEntity", b =>
+                {
+                    b.Property<string>("OperationId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("RawData")
+                        .HasMaxLength(5120)
+                        .HasColumnType("character varying(5120)");
+
+                    b.HasKey("OperationId");
+
+                    b.ToTable("operation_info_rawdata");
+                });
+
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", b =>
+                {
+                    b.HasOne("Service.BalanceHistory.Postgres.Models.BalanceHistoryEntity", "Balance")
+                        .WithOne("Info")
+                        .HasForeignKey("Service.BalanceHistory.Postgres.WalletBalanceUpdateOperationInfoEntity", "OperationId")
+                        .HasPrincipalKey("Service.BalanceHistory.Postgres.Models.BalanceHistoryEntity", "OperationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Balance");
+                });
+
+            modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.BalanceHistoryEntity", b =>
+                {
+                    b.Navigation("Info");
                 });
 #pragma warning restore 612, 618
         }
