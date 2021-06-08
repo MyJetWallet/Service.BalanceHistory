@@ -33,6 +33,13 @@ namespace Service.BalanceHistory.Client
             builder.RegisterInstance(factory.GetWalletBalanceUpdateOperationInfoService()).As<IWalletBalanceUpdateOperationInfoService>().SingleInstance();
         }
         
+        public static void RegisterSwapHistoryClient(this ContainerBuilder builder, string swapHistoryClientServiceUrl)
+        {
+            var factory = new BalanceHistoryClientFactory(swapHistoryClientServiceUrl);
+
+            builder.RegisterInstance(factory.GetSwapHistoryService()).As<ISwapHistoryService>().SingleInstance();
+        }
+        
         public static void RegisterTradeHistoryServiceBusClient(this ContainerBuilder builder, MyServiceBusTcpClient client, string queueName, TopicQueueType queryType, bool batchSubscriber)
         {
             if (batchSubscriber)
