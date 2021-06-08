@@ -1,18 +1,26 @@
 using System;
+using Service.BalanceHistory.Domain.Models;
 
 namespace Service.BalanceHistory.Postgres.Models
 {
-    public class SwapEntity
+    public class SwapEntity : Swap
     {
         public long Number { get; set; }
-        public DateTime EventDate { get; set; }
-        public long SequenceNumber { get; set; }
-        public string OperationId { get; set; }
-        public string AccountId { get; set; }
-        public string WalletId { get; set; }
-        public string FromAsset { get; set; }
-        public string ToAsset { get; set; }
-        public string FromVolume { get; set; }
-        public string ToVolume { get; set; }
+
+        public Swap GetParentObject()
+        {
+            return new Swap()
+            {
+                EventDate = this.EventDate,
+                SequenceNumber = this.SequenceNumber,
+                OperationId = this.OperationId,
+                AccountId = this.AccountId,
+                WalletId = this.WalletId,
+                FromAsset = this.FromAsset,
+                ToAsset = this.ToAsset,
+                FromVolume = this.FromVolume,
+                ToVolume = this.ToVolume
+            };
+        }
     }
 }
