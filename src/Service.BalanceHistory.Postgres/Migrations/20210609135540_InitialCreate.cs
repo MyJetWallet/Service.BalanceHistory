@@ -80,8 +80,6 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 {
                     OperationId = table.Column<string>(type: "text", nullable: false),
                     WalletId = table.Column<string>(type: "text", nullable: false),
-                    Number = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     SequenceNumber = table.Column<long>(type: "bigint", nullable: false),
                     AccountId = table.Column<string>(type: "text", nullable: true),
@@ -166,16 +164,16 @@ namespace Service.BalanceHistory.Postgres.Migrations
                 columns: new[] { "WalletId", "Symbol", "SequenceId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_swap_history_Number",
-                schema: "balancehistory",
-                table: "swap_history",
-                column: "Number");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_swap_history_OperationId_WalletId",
                 schema: "balancehistory",
                 table: "swap_history",
                 columns: new[] { "OperationId", "WalletId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_swap_history_SequenceNumber",
+                schema: "balancehistory",
+                table: "swap_history",
+                column: "SequenceNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_trade_history_SequenceId",

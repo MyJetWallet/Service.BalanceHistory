@@ -6,6 +6,7 @@ using DotNetCoreDecorators;
 using ME.Contracts.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Postgres;
 using Service.BalanceHistory.Postgres.Models;
 
@@ -33,7 +34,7 @@ namespace Service.BalanceHistory.Writer.Services
                 {
                     _logger.LogInformation("Handle cash swap event: {CashSwapEventJson}",
                         JsonSerializer.Serialize(currentEvent));
-                    var firstSwapEntity = new SwapEntity()
+                    var firstSwapEntity = new Swap()
                     {
                         OperationId = currentEvent.Header.RequestId,
                         AccountId = currentEvent.CashSwap.AccountId1,
@@ -45,7 +46,7 @@ namespace Service.BalanceHistory.Writer.Services
                         EventDate = currentEvent.Header.Timestamp.ToDateTime(),
                         SequenceNumber = currentEvent.Header.SequenceNumber
                     };
-                    var secondSwapEntity = new SwapEntity()
+                    var secondSwapEntity = new Swap()
                     {
                         OperationId = currentEvent.Header.RequestId,
                         AccountId = currentEvent.CashSwap.AccountId2,
@@ -60,7 +61,7 @@ namespace Service.BalanceHistory.Writer.Services
                     try
                     {
                         await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
-                        await ctx.UpsetAsync(new List<SwapEntity> {firstSwapEntity, secondSwapEntity});
+                        await ctx.UpsetAsync(new List<Swap> {firstSwapEntity, secondSwapEntity});
                     }
                     catch (Exception exception)
                     {

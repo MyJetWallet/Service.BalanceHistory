@@ -44,7 +44,6 @@ namespace Service.BalanceHistory.Services
                         .Where(swap => swap.EventDate < lastDate)
                         .OrderByDescending(swap => swap.EventDate)
                         .Take(request.BatchSize)
-                        .Select(swapEntity => swapEntity.GetParentObject())
                         .ToList();
                 }
                 else
@@ -53,7 +52,6 @@ namespace Service.BalanceHistory.Services
                         .Where(swap => swap.EventDate < lastDate && swap.WalletId == request.WalletId)
                         .OrderByDescending(swap => swap.EventDate)
                         .Take(request.BatchSize)
-                        .Select(swapEntity => swapEntity.GetParentObject())
                         .ToList();
                 }
             }

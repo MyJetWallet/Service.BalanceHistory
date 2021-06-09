@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain.Transactions;
 using MyJetWallet.Sdk.Service;
+using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Postgres
@@ -28,7 +29,7 @@ namespace Service.BalanceHistory.Postgres
         private const string OperationInfoTableName = "operation_info";
         private const string OperationInfoRawDataTableName = "operation_info_rawdata";
 
-        public DbSet<SwapEntity> Swaps { get; set; }
+        public DbSet<Swap> Swaps { get; set; }
         public DbSet<TradeHistoryEntity> Trades { get; set; }
         public DbSet<BalanceHistoryEntity> BalanceHistory { get; set; }
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
@@ -64,21 +65,20 @@ namespace Service.BalanceHistory.Postgres
 
         private void SetSwapHistoryEntity(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SwapEntity>().ToTable(SwapHistoryTableName);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.Number).UseIdentityColumn();
-            modelBuilder.Entity<SwapEntity>().HasKey(e => new {e.OperationId, e.WalletId});
-            modelBuilder.Entity<SwapEntity>().Property(e => e.OperationId);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.AccountId);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.WalletId);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.FromAsset);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.ToAsset);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.FromVolume);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.ToVolume);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.EventDate);
-            modelBuilder.Entity<SwapEntity>().Property(e => e.SequenceNumber);
-            modelBuilder.Entity<SwapEntity>().HasIndex(e => new { e.OperationId, e.WalletId });
-            modelBuilder.Entity<SwapEntity>().Property(e => e.SequenceNumber);
-            modelBuilder.Entity<SwapEntity>().HasIndex(e => e.Number);
+            modelBuilder.Entity<Swap>().ToTable(SwapHistoryTableName);
+            modelBuilder.Entity<Swap>().HasKey(e => new {e.OperationId, e.WalletId});
+            modelBuilder.Entity<Swap>().Property(e => e.OperationId);
+            modelBuilder.Entity<Swap>().Property(e => e.AccountId);
+            modelBuilder.Entity<Swap>().Property(e => e.WalletId);
+            modelBuilder.Entity<Swap>().Property(e => e.FromAsset);
+            modelBuilder.Entity<Swap>().Property(e => e.ToAsset);
+            modelBuilder.Entity<Swap>().Property(e => e.FromVolume);
+            modelBuilder.Entity<Swap>().Property(e => e.ToVolume);
+            modelBuilder.Entity<Swap>().Property(e => e.EventDate);
+            modelBuilder.Entity<Swap>().Property(e => e.SequenceNumber);
+            modelBuilder.Entity<Swap>().HasIndex(e => new { e.OperationId, e.WalletId });
+            modelBuilder.Entity<Swap>().Property(e => e.SequenceNumber);
+            modelBuilder.Entity<Swap>().HasIndex(e => e.SequenceNumber);
         }
 
         private void SetWalletBalanceEntity(ModelBuilder modelBuilder)
@@ -146,7 +146,7 @@ namespace Service.BalanceHistory.Postgres
             var result = await Trades.UpsertRange(entities).On(e => e.TradeUId).NoUpdate().RunAsync();
             return result;
         }
-        public async Task<int> UpsetAsync(IEnumerable<SwapEntity> entities)
+        public async Task<int> UpsetAsync(IEnumerable<Swap> entities)
         {
             var result = await Swaps
                 .UpsertRange(entities)

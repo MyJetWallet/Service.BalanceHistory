@@ -17,8 +17,46 @@ namespace Service.BalanceHistory.Postgres.Migrations
             modelBuilder
                 .HasDefaultSchema("balancehistory")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.6")
+                .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            modelBuilder.Entity("Service.BalanceHistory.Domain.Models.Swap", b =>
+                {
+                    b.Property<string>("OperationId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WalletId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AccountId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FromAsset")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FromVolume")
+                        .HasColumnType("text");
+
+                    b.Property<long>("SequenceNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ToAsset")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ToVolume")
+                        .HasColumnType("text");
+
+                    b.HasKey("OperationId", "WalletId");
+
+                    b.HasIndex("SequenceNumber");
+
+                    b.HasIndex("OperationId", "WalletId");
+
+                    b.ToTable("swap_history");
+                });
 
             modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.BalanceHistoryEntity", b =>
                 {
@@ -98,49 +136,6 @@ namespace Service.BalanceHistory.Postgres.Migrations
                     b.HasIndex("WalletId", "Symbol", "SequenceId");
 
                     b.ToTable("balance_history");
-                });
-
-            modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.SwapEntity", b =>
-                {
-                    b.Property<string>("OperationId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("WalletId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AccountId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("FromAsset")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FromVolume")
-                        .HasColumnType("text");
-
-                    b.Property<long>("Number")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<long>("SequenceNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ToAsset")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ToVolume")
-                        .HasColumnType("text");
-
-                    b.HasKey("OperationId", "WalletId");
-
-                    b.HasIndex("Number");
-
-                    b.HasIndex("OperationId", "WalletId");
-
-                    b.ToTable("swap_history");
                 });
 
             modelBuilder.Entity("Service.BalanceHistory.Postgres.Models.TradeHistoryEntity", b =>
