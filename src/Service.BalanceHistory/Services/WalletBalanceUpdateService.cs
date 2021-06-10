@@ -7,9 +7,11 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Domain.Models;
+using Service.BalanceHistory.Extensions;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
 using Service.BalanceHistory.Postgres;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Services
 {
@@ -37,16 +39,52 @@ namespace Service.BalanceHistory.Services
 
                 await using var ctx = DatabaseContext.Create(_dbContextOptionsBuilder);
 
+                List<BalanceHistoryEntity> balanceHistory;
+                if (request.LastSequenceId == null)
+                {
+                    balanceHistory = ctx
+                        .BalanceHistory
+                        .Where(elem => elem.WalletId == request.WalletId)
+                        .OrderByDescending(elem => elem.SequenceId)
+                        .Take(take)
+                        .ToList();
+                } 
+                else
+                {
+                    balanceHistory = ctx
+                        .BalanceHistory
+                        .Where(elem => elem.WalletId == request.WalletId && elem.SequenceId < request.LastSequenceId)
+                        .OrderByDescending(elem => elem.SequenceId)
+                        .Take(take)
+                        .ToList();
+                }
 
-                var data = ctx
-                    .BalanceHistory.LeftJoin(ctx.OperationInfo,
-                        bs => bs.OperationId,
-                        info => info.OperationId,
-                        (bs, info) => new
-                        {
-                            History = bs,
-                            Info = info
-                        }).Where(elem => elem.History.WalletId == request.WalletId);
+                var operationIdList = balanceHistory.Select(elem => elem.OperationId);
+
+                var infoHistory = ctx
+                    .OperationInfo
+                    .Where(elem => operationIdList.Contains(elem.OperationId))
+                    .ToList();
+
+                var data = balanceHistory.LeftOuterJoin(infoHistory,
+                    balance => balance.OperationId,
+                    info => info.OperationId,
+                    (balance, info) => new
+                    {
+                        History = balance,
+                        Info = info
+                    });
+                
+                // dont work
+                //var data = ctx
+                //    .BalanceHistory.LeftJoin(ctx.OperationInfo,
+                //        bs => bs.OperationId,
+                //        info => info.OperationId,
+                //        (bs, info) => new
+                //        {
+                //            History = bs,
+                //            Info = info
+                //        }).Where(elem => elem.History.WalletId == request.WalletId);
                 
                 if (request.LastSequenceId.HasValue)
                 {
@@ -65,12 +103,8 @@ namespace Service.BalanceHistory.Services
 
                 data = data.OrderByDescending(e => e.History.SequenceId).Take(take);
 
-                data = data.Include(e => e.Info);
-
-                var list = await data.ToListAsync();
-
                 var resp = new WalletBalanceUpdateList { BalanceUpdates = new List<WalletBalanceUpdate>() };
-                resp.BalanceUpdates.AddRange(list.Select(e => new WalletBalanceUpdate(e.History)));
+                resp.BalanceUpdates.AddRange(data.Select(e => new WalletBalanceUpdate(e.History)));
 
                 return resp;
             }

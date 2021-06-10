@@ -10,7 +10,7 @@ using Service.BalanceHistory.Postgres;
 namespace Service.BalanceHistory.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210609135540_InitialCreate")]
+    [Migration("20210610102640_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
