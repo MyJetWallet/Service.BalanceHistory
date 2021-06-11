@@ -9,6 +9,7 @@ using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
 using Service.BalanceHistory.Postgres;
+using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Services
 {
@@ -35,7 +36,10 @@ namespace Service.BalanceHistory.Services
             {
                 await using var ctx = new DatabaseContext(_dbContextOptionsBuilder.Options);
 
-                var data = ctx.Trades.Where(e => e.WalletId == request.WalletId);
+
+                var data = string.IsNullOrWhiteSpace(request.WalletId) 
+                    ? ctx.Trades 
+                    : ctx.Trades.Where(e => e.WalletId == request.WalletId);
 
                 if (request.LastSequenceId.HasValue)
                 {
