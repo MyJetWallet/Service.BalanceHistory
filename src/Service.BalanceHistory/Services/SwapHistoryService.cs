@@ -77,6 +77,8 @@ namespace Service.BalanceHistory.Services
                 SwapCollection = swaps,
                 Success = true
             };
+
+            //todo: remove this log after, will get many data and spam in ELK in prod
             _logger.LogInformation("Return GetSwapsAsync response: {JsonResponse}", JsonConvert.SerializeObject(response));
             return response;
         }
