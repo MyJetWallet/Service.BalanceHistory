@@ -6,6 +6,7 @@ using DotNetCoreDecorators;
 using ME.Contracts.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Postgres;
 using Service.BalanceHistory.Postgres.Models;
@@ -32,6 +33,10 @@ namespace Service.BalanceHistory.Writer.Services
             {
                 if (currentEvent.Header.EventType == "CASH_SWAP_OPERATION" && currentEvent.CashSwap != null)
                 {
+                    using var activity = MyTelemetry.StartActivity("Report swap operation");
+
+                    currentEvent.AddToActivityAsJsonTag("event-data");
+
                     _logger.LogInformation("Handle cash swap event: {CashSwapEventJson}",
                         JsonSerializer.Serialize(currentEvent));
                     var firstSwapEntity = new Swap()
@@ -65,6 +70,7 @@ namespace Service.BalanceHistory.Writer.Services
                     }
                     catch (Exception exception)
                     {
+                        exception.FailActivity();
                         _logger.LogError(exception.Message);
                     }
                 }
