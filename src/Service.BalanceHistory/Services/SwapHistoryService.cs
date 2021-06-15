@@ -40,19 +40,19 @@ namespace Service.BalanceHistory.Services
                 await using var context = new DatabaseContext(_dbContextOptionsBuilder.Options);
                 if (string.IsNullOrWhiteSpace(request.WalletId))
                 {
-                    swaps = context.Swaps
+                    swaps = await context.Swaps
                         .Where(swap => swap.EventDate < lastDate)
                         .OrderByDescending(swap => swap.EventDate)
                         .Take(request.BatchSize)
-                        .ToList();
+                        .ToListAsync();
                 }
                 else
                 {
-                    swaps = context.Swaps
+                    swaps = await context.Swaps
                         .Where(swap => swap.EventDate < lastDate && swap.WalletId == request.WalletId)
                         .OrderByDescending(swap => swap.EventDate)
                         .Take(request.BatchSize)
-                        .ToList();
+                        .ToListAsync();
                 }
             }
             catch (Exception exception)
