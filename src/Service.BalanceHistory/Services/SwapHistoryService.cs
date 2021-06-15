@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
 using Service.BalanceHistory.Grpc.Models;
@@ -25,7 +26,7 @@ namespace Service.BalanceHistory.Services
 
         public async Task<GetSwapsResponse> GetSwapsAsync(GetSwapsRequest request)
         {
-            _logger.LogInformation("Receive GetSwapsAsync request: {JsonRequest}", request);
+            _logger.LogInformation("Receive GetSwapsAsync request: {JsonRequest}", JsonConvert.SerializeObject(request));
 
             if (string.IsNullOrWhiteSpace(request.WalletId) && request.BatchSize % 2 != 0)
                 return new GetSwapsResponse() {Success = false, ErrorMessage = "Butch size must be even"};
@@ -76,7 +77,7 @@ namespace Service.BalanceHistory.Services
                 SwapCollection = swaps,
                 Success = true
             };
-            _logger.LogInformation("Return GetSwapsAsync response: {JsonResponse}", response);
+            _logger.LogInformation("Return GetSwapsAsync response: {JsonResponse}", JsonConvert.SerializeObject(response));
             return response;
         }
     }
