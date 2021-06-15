@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
 using Service.BalanceHistory.Domain.Models;
 using Service.BalanceHistory.Grpc;
@@ -26,6 +27,9 @@ namespace Service.BalanceHistory.Services
 
         public async Task<GetSwapsResponse> GetSwapsAsync(GetSwapsRequest request)
         {
+            request.WalletId.AddToActivityAsTag("walletId");
+            request.AddToActivityAsJsonTag("request-data");
+
             _logger.LogInformation("Receive GetSwapsAsync request: {JsonRequest}", JsonConvert.SerializeObject(request));
 
             if (string.IsNullOrWhiteSpace(request.WalletId) && request.BatchSize % 2 != 0)
@@ -78,8 +82,9 @@ namespace Service.BalanceHistory.Services
                 Success = true
             };
 
-            //todo: remove this log after, will get many data and spam in ELK in prod
-            _logger.LogInformation("Return GetSwapsAsync response: {JsonResponse}", JsonConvert.SerializeObject(response));
+            response.SwapCollection.Count.AddToActivityAsTag("response-count-items");
+
+            _logger.LogInformation("Return GetSwapsAsync response count items: {count}", response.SwapCollection.Count);
             return response;
         }
     }
