@@ -70,3 +70,45 @@ jobs:
         repository: ${{ secrets.ORG_NAME }}/service.balancehistory/myjetwallet.service.balancehistory.writer-test
         tags: latest
         build_args: app_version=myjetwallet.service.balancehistory.writer-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image ST service
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.ST_DOCKER_USER }}
+        password: ${{ secrets.ST_DOCKER_PASSWORD }}
+        path: ./publish-api
+        registry: simpletrading.azurecr.io
+        repository: spot/myjetwallet.service.balancehistory-test
+        tags: latest
+        add_git_labels: true
+        build_args: app_version=myjetwallet.service.balancehistory-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+
+    - name: Publish image ST writer
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.ST_DOCKER_USER }}
+        password: ${{ secrets.ST_DOCKER_PASSWORD }}
+        path: ./publish-api
+        registry: simpletrading.azurecr.io
+        repository: spot/myjetwallet.service.balancehistory.writer-test
+        tags: latest
+        add_git_labels: true
+        build_args: app_version=myjetwallet.service.balancehistory.writer-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}        
+
+
+  restart:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restart service
+      uses: Myjetwallet/kube-restart-pods@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
+        NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
+        POD: balance-history
+
+    - name: Restart writer
+      uses: Myjetwallet/kube-restart-pods@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
+        NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
+        POD: balance-history-writer     
