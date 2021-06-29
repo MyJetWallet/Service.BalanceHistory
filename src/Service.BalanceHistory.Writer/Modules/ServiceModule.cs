@@ -2,6 +2,7 @@
 using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
+using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
 using Service.BalanceHistory.ServiceBus;
@@ -18,20 +19,12 @@ namespace Service.BalanceHistory.Writer.Modules
         {
             ServiceBusLogger = Program.LogFactory.CreateLogger(nameof(MyServiceBusTcpClient));
 
-            var serviceBusClient = new MyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), ApplicationEnvironment.HostName);
-            serviceBusClient.Log.AddLogException(ex => ServiceBusLogger.LogInformation(ex, "Exception in MyServiceBusTcpClient"));
-            serviceBusClient.Log.AddLogInfo(info => ServiceBusLogger.LogDebug($"MyServiceBusTcpClient[info]: {info}"));
-            serviceBusClient.SocketLogs.AddLogInfo((context, msg) => ServiceBusLogger.LogInformation($"MyServiceBusTcpClient[Socket {context?.Id}|{context?.ContextName}|{context?.Inited}][Info] {msg}"));
-            serviceBusClient.SocketLogs.AddLogException((context, exception) => ServiceBusLogger.LogInformation(exception, $"MyServiceBusTcpClient[Socket {context?.Id}|{context?.ContextName}|{context?.Inited}][Exception] {exception.Message}"));
+            var serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), ApplicationEnvironment.HostName, Program.LogFactory);
 
+            builder.RegisterMyServiceBusPublisher<WalletTradeMessage>(serviceBusClient, WalletTradeMessage.TopicName, true);
+            
             builder.RegisterInstance(serviceBusClient).AsSelf().SingleInstance();
             builder.RegisterMeEventSubscriber(serviceBusClient, "balance-history", TopicQueueType.Permanent);
-            
-            builder
-                .RegisterInstance(new WalletTradeServiceBusPublisher(serviceBusClient))
-                .As<IPublisher<WalletTradeMessage>>()
-                .AutoActivate()
-                .SingleInstance();
             
             builder
                 .RegisterType<BalanceHistoryWriter>()

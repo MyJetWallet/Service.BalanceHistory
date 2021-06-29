@@ -10,7 +10,7 @@ namespace Service.BalanceHistory.ServiceBus
     public class WalletTradeServiceBusSubscriber : Subscriber<WalletTradeMessage>
     {
         public WalletTradeServiceBusSubscriber(MyServiceBusTcpClient client, string queueName, TopicQueueType queryType, bool batchSubscriber) :
-            base(client, WalletTradeServiceBusPublisher.TopicName, queueName, queryType,
+            base(client, WalletTradeMessage.TopicName, queueName, queryType,
                 bytes => bytes.ByteArrayToServiceBusContract<WalletTradeMessage>(), batchSubscriber)
         {
 
