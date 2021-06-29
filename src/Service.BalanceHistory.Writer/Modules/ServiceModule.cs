@@ -30,6 +30,7 @@ namespace Service.BalanceHistory.Writer.Modules
             builder
                 .RegisterInstance(new WalletTradeServiceBusPublisher(serviceBusClient))
                 .As<IPublisher<WalletTradeMessage>>()
+                .AutoActivate()
                 .SingleInstance();
             
             builder
