@@ -8,8 +8,8 @@ namespace Service.BalanceHistory.Postgres.Models
     {
         public TradeHistoryEntity(string tradeUId, string instrumentSymbol, double price, double baseVolume, double quoteVolume, 
             string orderId, OrderType type, double orderVolume, DateTime dateTime,  
-            OrderSide side, long sequenceId, string brokerId, string clientId, string walletId) 
-                : base(tradeUId, instrumentSymbol, price, baseVolume, quoteVolume, orderId, type, orderVolume, dateTime, side, sequenceId)
+            OrderSide side, long sequenceId, string brokerId, string clientId, string walletId, string feeAsset, double feeVolume) 
+                : base(tradeUId, instrumentSymbol, price, baseVolume, quoteVolume, orderId, type, orderVolume, dateTime, side, sequenceId, feeAsset, feeVolume)
         {
             BrokerId = brokerId;
             ClientId = clientId;
