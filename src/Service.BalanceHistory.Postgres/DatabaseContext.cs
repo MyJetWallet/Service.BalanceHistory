@@ -224,7 +224,7 @@ namespace Service.BalanceHistory.Postgres
         
         public async Task<int> UpsetAsync(IEnumerable<CashInOutHistoryEntity> entities)
         {
-            var result = await CashInOutHistory.UpsertRange(entities).On(e => e.Id).NoUpdate().RunAsync();
+            var result = await CashInOutHistory.UpsertRange(entities).On(e => new { e.SequenceId, e.WalletId, e.Asset}).NoUpdate().RunAsync();
             return result;
         }
 

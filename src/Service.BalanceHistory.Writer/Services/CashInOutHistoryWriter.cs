@@ -37,7 +37,6 @@ namespace Service.BalanceHistory.Writer.Services
             using var activity = MyTelemetry.StartActivity("Handle ME OutgoingEvent's")?.AddTag("count-events", events.Count);
             try
             {
-
                 var sw = new Stopwatch();
                 sw.Start();
 
@@ -91,7 +90,7 @@ namespace Service.BalanceHistory.Writer.Services
 
         private CashInOutHistoryEntity HandleCashInEvent(OutgoingEvent meEvent)
         {
-            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashIn.Fees);
+            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashIn.Fees.Where(f=>f.Transfer.SourceWalletId == meEvent.CashIn.WalletId).ToList());
             return new CashInOutHistoryEntity
             {
                 Asset = meEvent.CashIn.AssetId,
@@ -113,7 +112,7 @@ namespace Service.BalanceHistory.Writer.Services
 
         private CashInOutHistoryEntity HandleCashOutEvent(OutgoingEvent meEvent)
         {
-            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashOut.Fees);
+            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashOut.Fees.Where(f=>f.Transfer.SourceWalletId == meEvent.CashOut.WalletId).ToList());
             return new CashInOutHistoryEntity
             {
                 Asset = meEvent.CashOut.AssetId,
@@ -133,7 +132,7 @@ namespace Service.BalanceHistory.Writer.Services
             };
         }
 
-        private (decimal FeeAmount, string FeeAsset) CalculateFee(RepeatedField<Fee> fees)
+        private (decimal FeeAmount, string FeeAsset) CalculateFee(List<Fee> fees)
         {
             if (!fees.Any())
             {

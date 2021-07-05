@@ -45,6 +45,8 @@ namespace Service.BalanceHistory.Services
                 if (request.LastSequenceId.HasValue) data = data.Where(e => e.SequenceId < request.LastSequenceId);
 
                 if (!string.IsNullOrEmpty(request.Symbol)) data = data.Where(e => e.Asset == request.Symbol);
+                if (!string.IsNullOrEmpty(request.OperationType))
+                    data = data.Where(e => e.OperationType == request.OperationType);
 
                 data = data.OrderByDescending(e => e.SequenceId).Take(take);
 
