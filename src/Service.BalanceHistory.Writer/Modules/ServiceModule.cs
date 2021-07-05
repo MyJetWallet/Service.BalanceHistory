@@ -40,6 +40,11 @@ namespace Service.BalanceHistory.Writer.Modules
                 .RegisterType<SwapHistoryJob>()
                 .AutoActivate()
                 .SingleInstance();
+
+            builder
+                .RegisterType<CashInOutHistoryWriter>()
+                .AutoActivate()
+                .SingleInstance();
         }
     }
 }

@@ -28,6 +28,8 @@ namespace Service.BalanceHistory.Postgres
         private const string BalanceHistoryTableName = "balance_history";
         private const string OperationInfoTableName = "operation_info";
         private const string OperationInfoRawDataTableName = "operation_info_rawdata";
+        private const string CashInOutHistoryTableName = "cash_in_out_history";
+
 
         public DbSet<Swap> Swaps { get; set; }
         public DbSet<TradeHistoryEntity> Trades { get; set; }
@@ -35,6 +37,8 @@ namespace Service.BalanceHistory.Postgres
         public DbSet<WalletBalanceUpdateOperationInfoEntity> OperationInfo { get; set; }
         public DbSet<WalletBalanceUpdateOperationRawDataEntity> OperationInfoRawData { get; set; }
 
+        public DbSet<CashInOutHistoryEntity> CashInOutHistory { get; set; }
+        
         private Activity _activity;
 
         public DatabaseContext(DbContextOptions options) : base(options)
@@ -59,6 +63,7 @@ namespace Service.BalanceHistory.Postgres
             SetTradeHistoryEntity(modelBuilder);
             SetBalanceHistoryEntity(modelBuilder);
             SetWalletBalanceEntity(modelBuilder);
+            SetCashInOutHistoryEntity(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -138,7 +143,28 @@ namespace Service.BalanceHistory.Postgres
             modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.ClientId).HasMaxLength(128);
             modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.BrokerId).HasMaxLength(128);
             modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.InstrumentSymbol).HasMaxLength(64);
+            modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.FeeAsset).HasMaxLength(64);
             modelBuilder.Entity<TradeHistoryEntity>().Property(e => e.TradeUId).HasMaxLength(128);
+        }
+
+        private void SetCashInOutHistoryEntity(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CashInOutHistoryEntity>().ToTable(CashInOutHistoryTableName);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.Id).UseIdentityColumn();
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasKey(e => e.Id);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.OperationId).HasMaxLength(128);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.WalletId).HasMaxLength(128);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.ClientId).HasMaxLength(128);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.BrokerId).HasMaxLength(128);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.Asset).HasMaxLength(64);
+            modelBuilder.Entity<CashInOutHistoryEntity>().Property(e => e.FeeAsset).HasMaxLength(64);
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => new {e.SequenceId, e.WalletId, e.Asset}).IsUnique();
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => e.WalletId);
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => new { e.WalletId, e.Asset });
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => new { e.WalletId, e.SequenceId });
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => new { e.WalletId, e.Asset, e.SequenceId });
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => e.SequenceId);
+            modelBuilder.Entity<CashInOutHistoryEntity>().HasIndex(e => e.OperationId);
         }
 
         public async Task<int> UpsetAsync(IEnumerable<TradeHistoryEntity> entities)
@@ -193,6 +219,12 @@ namespace Service.BalanceHistory.Postgres
                     RawData = newEntity.RawData
                 })
                 .RunAsync();
+            return result;
+        }
+        
+        public async Task<int> UpsetAsync(IEnumerable<CashInOutHistoryEntity> entities)
+        {
+            var result = await CashInOutHistory.UpsertRange(entities).On(e => new { e.SequenceId, e.WalletId, e.Asset}).NoUpdate().RunAsync();
             return result;
         }
 
