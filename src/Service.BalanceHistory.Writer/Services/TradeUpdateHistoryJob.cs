@@ -67,7 +67,7 @@ namespace Service.BalanceHistory.Writer.Services
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError("Unable to record order with Id {Id}", order.Order.Id);
+                        _logger.LogError(e,"Unable to record order with Id {Id}", order.Order.Id);
                         return;
                     }
                     //Console.WriteLine($"{tradeId}[{walletId}] {side} {baseVolume} for {quoteVolume} price: {price} |{order.Order.LastMatchTime.ToDateTime():HH:mm:ss}");

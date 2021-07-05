@@ -15,14 +15,14 @@ using Service.BalanceHistory.Postgres.Models;
 
 namespace Service.BalanceHistory.Services
 {
-    public class CashInOutUpdateService : ICashInOutUpdateService
+    public class CashInOutHistoryService : ICashInOutHistoryService
     {
         public const int DefaultTakeValue = 50;
 
-        private readonly ILogger<CashInOutUpdateService> _logger;
+        private readonly ILogger<CashInOutHistoryService> _logger;
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
 
-        public CashInOutUpdateService(ILogger<CashInOutUpdateService> logger,
+        public CashInOutHistoryService(ILogger<CashInOutHistoryService> logger,
             DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder)
         {
             _logger = logger;

@@ -6,7 +6,7 @@ using Service.BalanceHistory.Grpc.Models;
 namespace Service.BalanceHistory.Grpc
 {
     [ServiceContract]
-    public interface ICashInOutUpdateService
+    public interface ICashInOutHistoryService
     {
         [OperationContract]
         Task<CashInOutList> GetCashInOutUpdatesAsync(GetCashInOutRequest request);
