@@ -8,7 +8,7 @@ namespace Service.BalanceHistory.Domain.Models
     public class WalletTrade
     {
         public WalletTrade(string tradeUId, string instrumentSymbol, double price, double baseVolume, double quoteVolume, string orderId, OrderType type, 
-            double orderVolume, DateTime dateTime, OrderSide side, long sequenceId)
+            double orderVolume, DateTime dateTime, OrderSide side, long sequenceId, string feeAsset, double feeVolume)
         {
             TradeUId = tradeUId;
             InstrumentSymbol = instrumentSymbol;
@@ -21,6 +21,8 @@ namespace Service.BalanceHistory.Domain.Models
             DateTime = dateTime;
             Side = side;
             SequenceId = sequenceId;
+            FeeAsset = feeAsset;
+            FeeVolume = feeVolume;
         }
 
         public WalletTrade()
@@ -29,7 +31,7 @@ namespace Service.BalanceHistory.Domain.Models
 
         public WalletTrade(WalletTrade trade) 
             : this(trade.TradeUId, trade.InstrumentSymbol, trade.Price, trade.BaseVolume, trade.QuoteVolume, trade.OrderId, trade.Type, 
-                   trade.OrderVolume, trade.DateTime, trade.Side, trade.SequenceId)
+                   trade.OrderVolume, trade.DateTime, trade.Side, trade.SequenceId, trade.FeeAsset, trade.FeeVolume)
         {
         }
 
@@ -65,5 +67,11 @@ namespace Service.BalanceHistory.Domain.Models
 
         [DataMember(Order = 11)]
         public long SequenceId { get; set; }
+        
+        [DataMember(Order = 12)]
+        public double FeeVolume { get; set; }
+        
+        [DataMember(Order = 13)]
+        public string FeeAsset { get; set; }
     }
 }

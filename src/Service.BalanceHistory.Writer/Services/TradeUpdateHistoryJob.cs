@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
+using Google.Protobuf.Collections;
 using ME.Contracts.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,17 @@ namespace Service.BalanceHistory.Writer.Services
                     var tradeId = $"{order.Order.ExternalId}-{order.SequenceNumber}";
                     var walletId = order.Order.WalletId;
                     var side = MapSide(order.Order.Side, order.Order.Straight);
-
+                    decimal feeVolume = 0;
+                    string feeAsset;
+                    try
+                    {
+                       (feeVolume, feeAsset) = CalculateOrderFee(order.Order.Trades);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e,"Unable to record order with Id {Id}", order.Order.Id);
+                        return;
+                    }
                     //Console.WriteLine($"{tradeId}[{walletId}] {side} {baseVolume} for {quoteVolume} price: {price} |{order.Order.LastMatchTime.ToDateTime():HH:mm:ss}");
 
                     var item = new TradeHistoryEntity(
@@ -68,7 +79,8 @@ namespace Service.BalanceHistory.Writer.Services
                         order.Order.LastMatchTime.ToDateTime(),
                         side,
                         order.SequenceNumber, 
-                        order.Order.BrokerId, order.Order.AccountId, walletId);
+                        order.Order.BrokerId, order.Order.AccountId, walletId,
+                        feeAsset, (double) feeVolume);
 
                     tradeActivity?.AddTag("brokerId", item.BrokerId);
                     tradeActivity?.AddTag("clientId", item.ClientId);
@@ -141,5 +153,32 @@ namespace Service.BalanceHistory.Writer.Services
 
             return OrderType.UnknownOrderType;
         }
+
+        private (decimal FeeAmount, string FeeAsset) CalculateOrderFee(RepeatedField<Order.Types.Trade> Trades)
+        {
+            if (!Trades.All(e => e.Fees.Any()))
+            {
+                _logger.LogWarning("Order without fees");
+                return (0, null);
+            }
+            var feeAsset = Trades.First().Fees.First().AssetId;
+
+            if (Trades.Any(e => e.Fees.Count > 1))
+            {
+                _logger.LogError("Multiple fee records at Trade with {tradeId}", Trades.Where(e=> e.Fees.Count>1).Select(e=> e.TradeId));
+                throw new ArgumentException("Multiple fee records are not supported");
+            }
+
+            if (Trades.Any(e => e.Fees.Any(f => f.AssetId != feeAsset)))
+            {
+                _logger.LogError("Fee records with different assets in one trade with {tradeId}", Trades.Where(e => e.Fees.Any(f => f.AssetId != feeAsset)).Select(e=>e.TradeId));
+                throw new ArgumentException("Fees in different assets are not supported");
+            }
+            
+            var feeAmount = Trades.Sum(e => decimal.Parse(e.Fees.First().Volume));
+
+            return (feeAmount, feeAsset);
+            
+    }
     }
 }

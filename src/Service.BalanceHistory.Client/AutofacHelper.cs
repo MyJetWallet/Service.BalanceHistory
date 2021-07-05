@@ -39,6 +39,14 @@ namespace Service.BalanceHistory.Client
 
             builder.RegisterInstance(factory.GetSwapHistoryService()).As<ISwapHistoryService>().SingleInstance();
         }
+
+        public static void RegisterCashInOutHistoryClient(this ContainerBuilder builder,
+            string cashInOutHistoryGrpcServiceUrl)
+        {
+            var factory = new BalanceHistoryClientFactory(cashInOutHistoryGrpcServiceUrl);
+            
+            builder.RegisterInstance(factory.GetCashInOutHistoryService()).As<ICashInOutHistoryService>().SingleInstance();
+        }
         
         public static void RegisterTradeHistoryServiceBusClient(this ContainerBuilder builder, MyServiceBusTcpClient client, string queueName, TopicQueueType queryType, bool batchSubscriber)
         {

@@ -58,6 +58,7 @@ namespace Service.BalanceHistory
                 endpoints.MapGrpcSchema<WalletBalanceUpdateService, IWalletBalanceUpdateService>();
                 endpoints.MapGrpcSchema<WalletTradeService, IWalletTradeService>();
                 endpoints.MapGrpcSchema<SwapHistoryService, ISwapHistoryService>();
+                endpoints.MapGrpcSchema<CashInOutHistoryService,ICashInOutHistoryService>();
 
                 endpoints.MapGrpcSchemaRegistry();
 
