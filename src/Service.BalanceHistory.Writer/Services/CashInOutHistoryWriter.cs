@@ -90,7 +90,7 @@ namespace Service.BalanceHistory.Writer.Services
 
         private CashInOutHistoryEntity HandleCashInEvent(OutgoingEvent meEvent)
         {
-            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashIn.Fees.Where(f=>f.Transfer?.SourceWalletId == meEvent.CashIn.WalletId).ToList());
+            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashIn.Fees.Where(f=>f?.Transfer?.SourceWalletId == meEvent.CashIn.WalletId).ToList());
             return new CashInOutHistoryEntity
             {
                 Asset = meEvent.CashIn.AssetId,
@@ -112,7 +112,7 @@ namespace Service.BalanceHistory.Writer.Services
 
         private CashInOutHistoryEntity HandleCashOutEvent(OutgoingEvent meEvent)
         {
-            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashOut.Fees.Where(f=>f.Transfer.SourceWalletId == meEvent.CashOut.WalletId).ToList());
+            var (feeVolume, feeAsset) = CalculateFee(meEvent.CashOut.Fees.Where(f=>f?.Transfer?.SourceWalletId == meEvent.CashOut.WalletId).ToList());
             return new CashInOutHistoryEntity
             {
                 Asset = meEvent.CashOut.AssetId,
