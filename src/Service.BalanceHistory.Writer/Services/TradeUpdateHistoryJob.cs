@@ -24,7 +24,7 @@ namespace Service.BalanceHistory.Writer.Services
         private readonly DbContextOptionsBuilder<DatabaseContext> _dbContextOptionsBuilder;
         private readonly IPublisher<WalletTradeMessage> _publisher;
 
-        public TradeUpdateHistoryJob(ISubscriber<IReadOnlyList<ME.Contracts.OutgoingMessages.OutgoingEvent>> subscriber,
+        public TradeUpdateHistoryJob(ISubscriber<IReadOnlyList<OutgoingEvent>> subscriber,
             ILogger<TradeUpdateHistoryJob> logger,
             DbContextOptionsBuilder<DatabaseContext> dbContextOptionsBuilder,
             IPublisher<WalletTradeMessage> publisher)
