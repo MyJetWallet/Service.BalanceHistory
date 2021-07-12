@@ -13,7 +13,7 @@
     <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="1.2.0" />
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.5.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
+    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
